@@ -1,5 +1,5 @@
 local posix, lfs, string = require [[posix]], require [[lfs]], string
-local package, socket = package = require [[socket]]
+local package, socket, uuid = package, require [[socket]], require [[uuid]]
 local rename, remove, open = os.rename, os.remove, io.open
 
 module [[seawolf.fs]]
@@ -73,17 +73,17 @@ function safe_open(filepath, timeout, retry, sign)
   local file_lock, file_sign = filepath .. [[.lock]]
 
   -- Try to open lock file
-  fh, err = io.open(file_lock)
+  fh, err = open(file_lock)
   if fh then
     -- Validate signature
     file_sign = fh:read [[*l]]
     fh:close()
     if file_sign == sign and sign:len() > 0 then
       -- Pre-create target file
-      fh, err = io.open(filepath, [[a+]])
+      fh, err = open(filepath, [[a+]])
       if fh then
         fh:close()
-        fh, err = io.open(filepath)
+        fh, err = open(filepath)
         return fh, sign, err
       else
         error [[I/O error: can't create session.]]
@@ -100,7 +100,7 @@ function safe_open(filepath, timeout, retry, sign)
     end
   else
     -- Try to lock
-    fh, err = io.open(file_lock, [[a+]])
+    fh, err = open(file_lock, [[a+]])
     if fh then
       -- Check is not signed yet
       if not fh:read [[*l]] then
@@ -133,14 +133,14 @@ function safe_write(filepath, sign, data)
   local file_lock, file_sign = filepath .. [[.lock]]
 
   -- Try to open lock file
-  fh, err = io.open(file_lock)
+  fh, err = open(file_lock)
   if fh then
     -- Validate signature
     file_sign = fh:read [[*l]]
     fh:close()
     if file_sign == sign and sign:len() > 0 then
       -- Try to open target file
-      fh, err = io.open(filepath, [[w]])
+      fh, err = open(filepath, [[w]])
       if fh then
         -- Save data
         fh:write(data)
@@ -161,7 +161,7 @@ end
 function safe_close(filepath, sign)
   local file_lock, file_sign = filepath .. [[.lock]]
 
-  fh, err = io.open(file_lock)
+  fh, err = open(file_lock)
   if fh then
     -- Validate signature
     file_sign = fh:read [[*l]]
