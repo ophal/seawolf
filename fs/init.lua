@@ -1,4 +1,4 @@
-local posix, lfs, string = require [[posix]], require [[lfs]], string
+local lfs, string = require [[lfs]], string
 local package, socket, uuid = package, require [[socket]], require [[uuid]]
 local rename, remove, open = os.rename, os.remove, io.open
 
@@ -44,10 +44,29 @@ function is_dir(path)
   return directory ~= nil and directory.mode == [[directory]] or false
 end
 
--- Tells whether the filename is writable
--- by Fernando P. García
-function is_writable(path)
-  return posix.access(path, [[w]])
+-- Tells whether the filename or directory is writable
+-- Warning: testing if a file/dir is writable does not guarantee
+-- that it will remain writable and therefore it is no replacement
+-- for checking the result of subsequent operations.
+-- @param file string: filename to test
+-- @return boolean: true if file exists, false otherwise.
+-- Copied from Luarocks' function of same name.
+function is_writable(file)
+   assert(file)
+   file = normalize(file)
+   local result
+   if fs.is_dir(file) then
+      local file2 = dir.path(file, '.tmpluarockstestwritable')
+      local fh = io.open(file2, 'wb')
+      result = fh ~= nil
+      if fh then fh:close() end
+      os.remove(file2)
+   else
+      local fh = io.open(file, 'r+b')
+      result = fh ~= nil
+      if fh then fh:close() end
+   end
+   return result
 end
 
 -- Opens file or URL
