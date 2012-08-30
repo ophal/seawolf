@@ -1,8 +1,23 @@
+-- Try lo load deprecated PREG library
+local rex_loaded, rex = pcall(function () return require [[rex_pcre]] end)
+if rex_loaded then
+  PREG_SPLIT_NO_EMPTY = 1
+  PREG_SPLIT_DELIM_CAPTURE = 2
+  PREG_SPLIT_OFFSET_CAPTURE = 4
+  PREG_OFFSET_CAPTURE = 256
+else
+  return FALSE
+end
+local type, pairs = type, pairs
+local rawset, empty = rawset, empty
+
+module [[seawolf.text.preg]]
+
 -- PREG library (deprecated)
 
 -- Perform a regular expression search and replace
 -- Copied and adapted from http://lua-users.org/wiki/MakingLuaLikePhp
-function preg_replace(pattern, replacement, subject, limit, pcre_flags)
+function replace(pattern, replacement, subject, limit, pcre_flags)
   pcre_flags = pcre_flags or [[]]
 
   local sk, s, sp, p
@@ -44,14 +59,14 @@ end
 --
 -- For the use of pcre_flags parameter, please see the following link:
 --   http://www.php.net/manual/en/reference.pcre.pattern.modifiers.php
-function preg_match(pattern, subject, matches, flags, offset, pcre_flags)
+function match(pattern, subject, matches, flags, offset, pcre_flags)
   subject = subject or [[]]
   offset = offset or 1
 
   local match
   local k, matches_ = 0, {}
   if flags == PREG_OFFSET_CAPTURE then
-    offset, _, match = rex.find(subject, pattern, offset, nil, pcre_flags)
+    offset, _, match = rex.find(subject, pattern, offset, pcre_flags)
     if match ~= nil then
       k = 1
       rawset(matches_, k, {match, offset})
@@ -70,33 +85,36 @@ function preg_match(pattern, subject, matches, flags, offset, pcre_flags)
   return k > 0 and 1 or 0
 end
 
--- Helper function for preg_replace_callback
+-- Helper function for replace_callback
 -- by Fernando P. García
-local function _preg_replace_callback(match, init)
-  init = not empty(init)
-  local env = static([[_preg_replace_callback_callback]])
-  if init then
-    env.v = match -- store parameters from parent function: preg_replace_callback
-    return
-  end
-  env.v.count = env.v.count + 1
-  if env.v.limit > -1 then
-    if env.v.count > env.v.limit then
+do
+  local env = {v = nil}
+  local function _replace_callback(match, init)
+    init = not empty(init)
+    local env = env
+    if init then
+      env.v = match -- store parameters from parent function: replace_callback
       return
     end
+    env.v.count = env.v.count + 1
+    if env.v.limit > -1 then
+      if env.v.count > env.v.limit then
+        return
+      end
+    end
+    return _G[env.v.callback]({match, match})
   end
-  return _G[env.v.callback]({match, match})
 end
 
 -- Perform a regular expression search and replace using a callback
 -- by Fernando P. García
-function preg_replace_callback(pattern, callback, subject, limit, count, pcre_flags)
+function replace_callback(pattern, callback, subject, limit, count, pcre_flags)
   limit = limit or -1
 
   local result
   local params = {callback = callback, limit = limit, count = 0}
-  _preg_replace_callback(params, true)
-  result = rex.gsub(subject, pattern, _preg_replace_callback, nil, pcre_flags)
+  _replace_callback(params, true)
+  result = rex.gsub(subject, pattern, _replace_callback, nil, pcre_flags)
 
   -- count_ref
   if type(count) == [[table]] then
@@ -110,7 +128,7 @@ end
 -- by Fernando P. García
 -- TODO: pcre_flags should be read from pattern, just as in PHP
 -- TODO: flags should work just as in PHP
-function preg_split(pattern, subject, limit, flags, pcre_flags)
+function split(pattern, subject, limit, flags, pcre_flags)
   if limit == -1 or limit == 0 or limit == nil then limit = nil end
   flags = flags or 0
 

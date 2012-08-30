@@ -2,8 +2,8 @@ require [[seawolf.variable]]
 local io, lpeg = io, require [[lpeg]]
 local require, string, table, type, pairs = require, string, table, type, pairs
 local rawset, is_array, tostring = rawset, seawolf.variable.is_array, tostring
-local empty, static = seawolf.variable.empty, seawolf.variable.static 
-local pcall = pcall
+local empty = seawolf.variable.empty
+local pcall, dofile = pcall, dofile
 
 module [[seawolf.text]]
 
@@ -247,14 +247,4 @@ function implode(glue, pieces)
     table.insert(t, i)
   end
   return table.concat(t, glue)
-end
-
--- Try lo load deprecated PREG library
-rex = pcall([[require]], [[rex_pcre]])
-if rex then
-  PREG_SPLIT_NO_EMPTY = 1
-  PREG_SPLIT_DELIM_CAPTURE = 2
-  PREG_SPLIT_OFFSET_CAPTURE = 4
-  PREG_OFFSET_CAPTURE = 256
-  dofile [[preg.lua]]
 end
