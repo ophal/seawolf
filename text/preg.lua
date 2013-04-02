@@ -67,10 +67,12 @@ function match(pattern, subject, matches, flags, offset, pcre_flags)
   local k, matches_ = 0, {}
   if flags == PREG_OFFSET_CAPTURE then
     offset, _, match = rex.find(subject, pattern, offset, pcre_flags)
-    if match ~= nil then
+    if offset ~= nil then
       k = 1
-      rawset(matches_, k, {match, offset})
-      rawset(matches_, k + 1, {match, offset})
+      if match ~= nil then
+        rawset(matches_, k, {match, offset})
+        rawset(matches_, k + 1, {match, offset})
+      end
     end
   else
     for match in rex.gmatch(subject, pattern, pcre_flags) do
