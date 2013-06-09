@@ -3,7 +3,7 @@ local io, lpeg = io, require [[lpeg]]
 local require, string, table, type, pairs = require, string, table, type, pairs
 local rawset, is_array, tostring = rawset, seawolf.variable.is_array, tostring
 local empty = seawolf.variable.empty
-local pcall, dofile = pcall, dofile
+local pcall, dofile, floor, tconcat = pcall, dofile, math.floor, table.concat
 
 module [[seawolf.text]]
 
@@ -247,4 +247,48 @@ function implode(glue, pieces)
     table.insert(t, i)
   end
   return table.concat(t, glue)
+end
+
+do
+  --[[
+    Map string chars into a table.
+
+    by LU324_ and DigitalKiwi.
+  ]]
+  function str2map(s)
+    local map, maplen = {}, 0
+    for p in (s):gmatch('.') do
+      maplen = maplen + 1
+      map[maplen] = p
+    end
+    return map, maplen
+  end
+
+  -- Default string map and maplen for int2strmap()
+  local default_map, default_maplen = str2map('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+
+  --[[
+    Convert given integer to alphanumeric (numbers + lower case + upper case).
+
+    by LU324_ and q66 (Copied and adapted from http://lua-users.org/lists/lua-l/2004-09/msg00054.html).
+  ]]
+  function int2strmap(IN, map)
+    local buffer, i, d, maplen = {}, 0
+
+    if map == nil then
+      map, maplen = default_map, default_maplen
+    else
+      map, maplen = str2map(map)
+    end
+
+    while IN > 0 do
+      i = i + 1
+      IN, d = floor(IN/maplen), IN % maplen + 1
+      buffer[i] = map[d]
+    end
+    for j = 1, i/2 do
+      buffer[j], buffer[i-j+1] = buffer[i-j+1], buffer[j]
+    end
+    return tconcat(buffer)
+  end
 end
