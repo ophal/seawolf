@@ -298,7 +298,7 @@ do
     Convert given string to integer by (optional) given string map.
   ]]
   function str2intmap(str, map)
-    local buffer, int, i, rmap, maplen = {}, 0, 0
+    local buffer, int, i, rmap, maplen = {}, 0, #str
 
     if map == nil then
       rmap, maplen = default_rmap, default_maplen
@@ -307,8 +307,8 @@ do
     end
 
     for c in (str):gmatch('.') do
-      int = int + rmap[c] + i*maplen - 1
-      i = i + 1
+      i = i - 1
+      int = int + (rmap[c] - 1)*maplen^i
     end
 
     return int
