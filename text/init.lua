@@ -4,6 +4,7 @@ local require, string, table, type, pairs = require, string, table, type, pairs
 local rawset, is_array, tostring = rawset, seawolf.variable.is_array, tostring
 local empty = seawolf.variable.empty
 local pcall, dofile, floor, tconcat = pcall, dofile, math.floor, table.concat
+local print = print
 
 module [[seawolf.text]]
 
@@ -256,19 +257,20 @@ do
     by LU324_ and DigitalKiwi.
   ]]
   function str2map(s)
-    local map, maplen = {}, 0
-    for p in (s):gmatch('.') do
-      maplen = maplen + 1
-      map[maplen] = p
+    local map, rmap, i = {}, {}, 0
+    for c in (s):gmatch('.') do
+      i = i + 1
+      map[i] = c
+      rmap[c] = i
     end
-    return map, maplen
+    return map, i, rmap
   end
 
   -- Default string map and maplen for int2strmap()
-  local default_map, default_maplen = str2map('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+  local default_map, default_maplen, default_rmap = str2map('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 
   --[[
-    Convert given integer to alphanumeric (numbers + lower case + upper case).
+    Convert given integer to alphanumeric.
 
     by LU324_ and q66 (Copied and adapted from http://lua-users.org/lists/lua-l/2004-09/msg00054.html).
   ]]
@@ -290,5 +292,25 @@ do
       buffer[j], buffer[i-j+1] = buffer[i-j+1], buffer[j]
     end
     return tconcat(buffer)
+  end
+
+  --[[
+    Convert given string to integer by (optional) given string map.
+  ]]
+  function str2intmap(str, map)
+    local buffer, int, i, rmap, maplen = {}, 0, 0
+
+    if map == nil then
+      rmap, maplen = default_rmap, default_maplen
+    else
+      map, maplen, rmap = str2map(map)
+    end
+
+    for c in (str):gmatch('.') do
+      int = int + rmap[c] + i*maplen - 1
+      i = i + 1
+    end
+
+    return int
   end
 end
