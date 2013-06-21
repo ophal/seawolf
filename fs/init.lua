@@ -1,5 +1,5 @@
 local lfs, string = require [[lfs]], string
-local package, socket, uuid = package, require [[socket]], require [[uuid]]
+local package, sleep, uuid = package, require 'socket'.sleep, require [[uuid]]
 local rename, remove, open = os.rename, os.remove, io.open
 
 module [[seawolf.fs]]
