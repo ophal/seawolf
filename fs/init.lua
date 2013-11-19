@@ -44,6 +44,11 @@ function is_dir(path)
   return directory ~= nil and directory.mode == [[directory]] or false
 end
 
+-- Copied from Luarocks' function of same name
+function normalize(name)
+   return name:gsub("\\", "/"):gsub("(.)/*$", "%1")
+end
+
 -- Tells whether the filename or directory is writable
 -- Warning: testing if a file/dir is writable does not guarantee
 -- that it will remain writable and therefore it is no replacement
