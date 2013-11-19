@@ -1,6 +1,7 @@
 local lfs, string = require [[lfs]], string
 local package, sleep, uuid = package, require 'socket'.sleep, require [[uuid]]
 local rename, remove, open = os.rename, os.remove, io.open
+local tconcat, tremove = table.concat, table.remove
 
 module [[seawolf.fs]]
 
@@ -47,6 +48,30 @@ end
 -- Copied from Luarocks' function of same name
 function normalize(name)
    return name:gsub("\\", "/"):gsub("(.)/*$", "%1")
+end
+
+-- Describe a path in a cross-platform way.
+-- Use this function to avoid platform-specific directory
+-- separators in other modules. Removes trailing slashes from
+-- each component given, to avoid repeated separators.
+-- Separators inside strings are kept, to handle URLs containing
+-- protocols.
+-- @param ... strings representing directories
+-- @return string: a string with a platform-specific representation
+-- of the path.
+-- Copied from Luarocks' function of same name
+function path(...)
+   local items = {...}
+   local i = 1
+   while items[i] do
+      items[i] = items[i]:gsub("(.+)/+$", "%1")
+      if items[i] == "" then
+         tremove(items, i)
+      else
+         i = i + 1
+      end
+   end
+   return (tconcat(items, "/"):gsub("(.+)/+$", "%1"))
 end
 
 -- Tells whether the filename or directory is writable
