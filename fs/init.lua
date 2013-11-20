@@ -82,17 +82,16 @@ end
 -- @return boolean: true if file exists, false otherwise.
 -- Copied from Luarocks' function of same name.
 function is_writable(file)
-   assert(file)
    file = normalize(file)
    local result
-   if fs.is_dir(file) then
-      local file2 = dir.path(file, '.tmpluarockstestwritable')
-      local fh = io.open(file2, 'wb')
+   if is_dir(file) then
+      local file2 = path(file, '.tmpluarockstestwritable')
+      local fh = open(file2, 'wb')
       result = fh ~= nil
       if fh then fh:close() end
-      os.remove(file2)
+      remove(file2)
    else
-      local fh = io.open(file, 'r+b')
+      local fh = open(file, 'r+b')
       result = fh ~= nil
       if fh then fh:close() end
    end
