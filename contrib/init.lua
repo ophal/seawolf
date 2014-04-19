@@ -130,3 +130,12 @@ function table_dump (tab, outf, ind, pre)
   if many then outf (pre) end
   outf ("}")
 end
+
+-- Shift an element off the beginning of a table
+function table_shift(t)
+  local function _table_shift(_, ...)
+    return {...}
+  end
+
+  return _table_shift(unpack(t))
+end
