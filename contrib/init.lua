@@ -1,4 +1,4 @@
-local type, print, rawget = type, print, rawget
+local type, print, rawget, unpack = type, print, rawget, unpack
 local table, pairs = table, pairs
 local ipairs, tostring = ipairs, tostring
 local format = string.format
