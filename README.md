@@ -6,12 +6,11 @@ Seawolf packages reuse Lua modules that are helpful for web development.
 * [Lua MD5](http://www.keplerproject.org/md5)
 * [lrandom](http://www.tecgraf.puc-rio.br/~lhf/ftp/lua/#lrandom)
 * [luuid](http://www.tecgraf.puc-rio.br/~lhf/ftp/lua/#luuid)
-* [lrexlib-pcre](http://lrexlib.luaforge.net)
+* [lrexlib-pcre](http://lrexlib.luaforge.net) **(optional)**
 * [LuaFileSystem](http://www.keplerproject.org/luafilesystem)
-* [luaposix](http://luaforge.net/projects/luaposix)
-* [lua-imlib2](http://asbradbury.org/projects/lua-imlib2)
+* [lua-imlib2](http://asbradbury.org/projects/lua-imlib2) **(optional)**
 * [LuaSocket](http://luasocket.luaforge.net)
-* [LuaSQL](http://www.keplerproject.org/luasql)
+* [LuaSQL](http://www.keplerproject.org/luasql) **(optional)**
 
 
 ### Functions by package

@@ -13,6 +13,11 @@ description = {
 }
 dependencies = {
   'lua = 5.1',
+  'lpeg',
+  'luasocket',
+  'luafilesystem',
+  'md5',
+  'luuid',
 }
 build = {
   type = 'builtin',
@@ -29,16 +34,4 @@ build = {
     ['seawolf.variable'] = 'variable/init.lua',
     ['seawolf.variable.serialize'] = 'variable/serialize/init.lua',
   },
-  --[=[
-  copy_directories = {
-    'behaviour',
-    'calendar',
-    'contrib',
-    'database',
-    'fs',
-    'maths',
-    'other',
-    'text',
-    'variable',
-  },]=]
 }
