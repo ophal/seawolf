@@ -132,10 +132,11 @@ function table_dump (tab, outf, ind, pre)
 end
 
 -- Shift an element off the beginning of a table
-function table_shift(t)
+do
   local function _table_shift(_, ...)
     return {...}
   end
-
-  return _table_shift(unpack(t))
+  function table_shift(t)
+    return _table_shift(unpack(t))
+  end
 end
