@@ -284,3 +284,36 @@ end
 function flush()
  -- TODO: Implement buffering for performance
 end
+
+-- Generate a hash value (message digest)
+-- by Fernando P. Garcia
+do
+  local _hash = {
+    md5 = {
+      [true] = require 'md5'.sum,
+      [false] = require 'md5'.sumhexa,
+    },
+    sha256 = {
+      [true] = require 'sha2'.sha256,
+      [false] = require 'sha2'.sha256hex,
+    },
+    sha384 = {
+      [true] = require 'sha2'.sha384,
+      [false] = require 'sha2'.sha384hex,
+    },
+    sha512 = {
+      [true] = require 'sha2'.sha512,
+      [false] = require 'sha2'.sha512hex,
+    },
+  }
+
+  function hash(algo, data, raw_output)
+    if raw_output == nil then raw_output = false end
+
+    if _hash[algo] then
+      return _hash[algo][raw_output](data)
+    else
+      error(('[seawolf.other] in function hash(): unknown hash algorythm "%s"'):format(algo))
+    end
+  end
+end
