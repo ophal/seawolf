@@ -1,7 +1,7 @@
-require [[seawolf.text]]
+require 'seawolf.text'
 local string, require, substr = string, require, seawolf.text.substr
 
-module([[seawolf.other]], package.seeall)
+module 'seawolf.other'
 
 -- Generate a unique ID
 -- Migrated from Drupy (authored by Brendon Crawford)
@@ -293,9 +293,13 @@ do
       [true] = require 'md5'.sum,
       [false] = require 'md5'.sumhexa,
     },
+    sha224 = {
+      [true] = function() end,
+      [false] = require 'lsha2'.hash224,
+    },
     sha256 = {
-      [true] = require 'sha2'.sha256,
-      [false] = require 'sha2'.sha256hex,
+      [true] = require 'sha2'.sha256hex,
+      [false] = require 'lsha2'.hash256,
     },
     sha384 = {
       [true] = require 'sha2'.sha384,
