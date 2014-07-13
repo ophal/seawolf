@@ -17,7 +17,7 @@ Seawolf packages reuse Lua modules that are helpful for web development.
 NOTICE: some functions may be deprecated and/or replaced over time, in aims of improving Ophal's coding standards.
 
 * ** Behaviour **
-  ini_get
+  temp_dir
 
 * ** Calendar **
   microtime
