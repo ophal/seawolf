@@ -3,26 +3,27 @@ local package, sleep, uuid = package, require 'socket'.sleep, require [[uuid]]
 local rename, remove, open = os.rename, os.remove, io.open
 local tconcat, tremove = table.concat, table.remove
 
-module [[seawolf.fs]]
 
 -- LUA_DIRSEP is the first character in the string package.config, see
 -- src/loadlib.c in your lua source tree for reference
-LUA_DIRSEP = string.sub(package.config,1,1)
+local LUA_DIRSEP = string.sub(package.config,1,1)
+
+local m = {}
 
 -- Returns directory name component of path
 -- Copied and adapted from http://dev.alpinelinux.org/alpine/acf/core/acf-core-0.4.20.tar.bz2/acf-core-0.4.20/lib/fs.lua
-function dirname(string_)
+function m.dirname(string_)
   string_ = string_ or [[]]
   -- strip trailing / first
   string_ = string.gsub(string_, LUA_DIRSEP .. [[$]], [[]])
-  local basename = basename(string_)
+  local basename = m.basename(string_)
   string_ = string.sub(string_, 1, #string_ - #basename - 1)
   return(string_)  
 end
 
 -- Returns string with any leading directory components removed. If specified, also remove a trailing suffix. 
 -- Copied and adapted from http://dev.alpinelinux.org/alpine/acf/core/acf-core-0.4.20.tar.bz2/acf-core-0.4.20/lib/fs.lua
-function basename(string_, suffix)
+function m.basename(string_, suffix)
   string_ = string_ or [[]]
   local basename = string.gsub(string_, '[^'.. LUA_DIRSEP ..']*'.. LUA_DIRSEP, [[]])
   if suffix then
@@ -33,20 +34,20 @@ end
 
 -- Tells whether the filename is a regular file
 -- by Fernando P. García
-function is_file(filename)
+function m.is_file(filename)
   local file, err = lfs.attributes(filename)
   return err == nil and file.mode == [[file]] or false
 end
 
 -- Tells whether the filename is a directory
 -- by Fernando P. García
-function is_dir(path)
+function m.is_dir(path)
   local directory, err = lfs.attributes(path)
   return directory ~= nil and directory.mode == [[directory]] or false
 end
 
 -- Copied from Luarocks' function of same name
-function normalize(name)
+function m.normalize(name)
    return name:gsub("\\", "/"):gsub("(.)/*$", "%1")
 end
 
@@ -60,7 +61,7 @@ end
 -- @return string: a string with a platform-specific representation
 -- of the path.
 -- Copied from Luarocks' function of same name
-function path(...)
+function m.path(...)
    local items = {...}
    local i = 1
    while items[i] do
@@ -81,7 +82,7 @@ end
 -- @param file string: filename to test
 -- @return boolean: true if file exists, false otherwise.
 -- Copied from Luarocks' function of same name.
-function is_writable(file)
+function m.is_writable(file)
    file = normalize(file)
    local result
    if is_dir(file) then
@@ -100,19 +101,19 @@ end
 
 -- Opens file or URL
 -- TODO
-function fopen(filename, mode, use_include_path, context)
+function m.fopen(filename, mode, use_include_path, context)
   if use_include_path == nil then use_include_path = false end
   return io.open(filename, mode)
 end
 
 -- Binary-safe file read
 -- TODO: validate "length"
-function fread(handle, length)
+function m.fread(handle, length)
   return handle:read(length)
 end
 
 -- Thread-safe open file in read mode
-function safe_open(filepath, timeout, retry, sign)
+function m.safe_open(filepath, timeout, retry, sign)
   if not timeout then timeout = 0.001 end
   if not retry then retry = 0 end -- for internal use only!
   if not sign then sign = [[]] end -- for internal use only!
@@ -141,7 +142,7 @@ function safe_open(filepath, timeout, retry, sign)
       sleep(timeout)
       retry = retry + 1
       if retry <= 224 then
-        return safe_open(filepath, timeout, retry)
+        return m.safe_open(filepath, timeout, retry)
       else
         return nil, ([[%s retries without luck :(]]):format(retry - 1)
       end
@@ -157,12 +158,12 @@ function safe_open(filepath, timeout, retry, sign)
         fh:write("\n")
         fh:close()
         -- Try to re-open lock
-        return safe_open(filepath, timeout, retry, file_sign)
+        return m.safe_open(filepath, timeout, retry, file_sign)
       else        
         sleep(timeout)
         retry = retry + 1
         if retry <= 224 then
-          return safe_open(filepath, timeout, retry)
+          return m.safe_open(filepath, timeout, retry)
         else
           return nil, ([[%s retries without luck :(]]):format(retry - 1)
         end
@@ -174,7 +175,7 @@ function safe_open(filepath, timeout, retry, sign)
 end
 
 -- Write to file opened by safe_open()
-function safe_write(filepath, sign, data)
+function m.safe_write(filepath, sign, data)
   if not sign then sign = [[]] end 
 
   local fh, err, unlocked
@@ -206,7 +207,7 @@ function safe_write(filepath, sign, data)
 end
 
 -- Unlock file opened by safe_open()
-function safe_close(filepath, sign)
+function m.safe_close(filepath, sign)
   local file_lock, file_sign = filepath .. [[.lock]]
 
   fh, err = open(file_lock)
@@ -225,3 +226,5 @@ function safe_close(filepath, sign)
     end
   end
 end
+
+return m

@@ -1,8 +1,8 @@
-require [[seawolf.variable]]
+local seawolf = require 'seawolf'.__build 'variable'
 local empty, require, ini_get, assert, pairs = seawolf.variable.empty,
       require, ini_get, assert, pairs
 
-module [[seawolf.database]]
+local m = {}
 
 -- TODO:
 --~ MYSQL_CLIENT_SSL = 
@@ -16,7 +16,7 @@ do
   -- TODO: multiple connections
   local luasql_mysql, luamysql = {}
   -- Open a connection to a MySQL Server
-  function mysql_connect(server, username, password, new_link) -- TODO, client_flags)
+  function m.mysql_connect(server, username, password, new_link) -- TODO, client_flags)
     server = server or ini_get [[mysql.default_host]]
     server = not empty(server) and server or [[localhost:3306]]
     username = username or ini_get [[mysql.default_user]]
@@ -36,7 +36,7 @@ do
   end
 
   -- Select a MySQL database
-  function mysql_select_db(database_name, link_identifier)
+  function m.mysql_select_db(database_name, link_identifier)
     link_identifier = link_identifier or luasql_mysql.connection
     if not empty(link_identifier) and not empty(database_name) then
       rs, luasql_mysql.err = link_identifier:execute([[use ]] .. database_name)
@@ -45,18 +45,18 @@ do
   end
 
   -- Returns the text of the error message from previous MySQL operation
-  function mysql_error(link_identifier)
-    return luasql_mysql.err or [[]]
+  function m.mysql_error(link_identifier)
+    return luasql_mysql.err or ''
   end
 
   -- Ping a server connection or reconnect if there is no connection
-  function mysql_ping()
+  function m.mysql_ping()
     -- TODO: implement this functionality
     return true
   end
 
   -- Send a MySQL query
-  function mysql_query(query, link_identifier)
+  function m.mysql_query(query, link_identifier)
     local rs
 
     link_identifier = link_identifier or luasql_mysql.connection
@@ -67,7 +67,7 @@ do
   end
 
   -- Fetch a result row as an associative array
-  function mysql_fetch_assoc(result)
+  function m.mysql_fetch_assoc(result)
     return function()
       local row = {result:fetch()}
       if not empty(row) then
@@ -83,22 +83,22 @@ do
   end
 
   -- TODO: Fetch a result row as an associative array, a numeric array, or both
-  function mysql_fetch_array(...)
-    return mysql_fetch_assoc(...)
+  function m.mysql_fetch_array(...)
+    return m.mysql_fetch_assoc(...)
   end
 
   -- Get number of rows in result
-  function mysql_num_rows(resource)
+  function m.mysql_num_rows(resource)
     return resource:numrows()
   end
 
   -- Get number of fields in result
-  function mysql_num_fields(resource)
+  function m.mysql_num_fields(resource)
     return #resource:getcolnames()
   end
 
   -- Get column information from a result and return as an object
-  function mysql_fetch_field(resource, field_offset)
+  function m.mysql_fetch_field(resource, field_offset)
     return {
       name = resource:getcolnames()[field_offset],
       type = resource:getcoltypes()[field_offset],
@@ -106,7 +106,7 @@ do
   end
 
   -- Get a result row as an enumerated array
-  function mysql_fetch_row(resource)
+  function m.mysql_fetch_row(resource)
     return function()
       local row = {resource:fetch()}
       if not empty(row) then
@@ -116,23 +116,25 @@ do
   end
 
   -- Escapes special characters in a string for use in a SQL statement
-  function mysql_real_escape_string(string_, link_identifier)
+  function m.mysql_real_escape_string(string_, link_identifier)
     link_identifier = link_identifier or luasql_mysql.connection
     return link_identifier:escape(string_)
   end
 
   -- Get affected rows
-  function mysql_affected_rows(resource)
+  function m.mysql_affected_rows(resource)
     return resource:numrows()
   end
 
   -- Get the ID generated in the last query
-  function mysql_insert_id(link_identifier)
-    return mysql_query([[SELECT LAST_INSERT_ID()]]):fetch()
+  function m.mysql_insert_id(link_identifier)
+    return m.mysql_query([[SELECT LAST_INSERT_ID()]]):fetch()
   end
 
   -- Ping a server connection or reconnect if there is no connection
-  function mysql_ping ()
-    return assert(mysql_query([[SELECT 1]]):fetch())
+  function m.mysql_ping ()
+    return assert(m.mysql_query([[SELECT 1]]):fetch())
   end
 end
+
+return m

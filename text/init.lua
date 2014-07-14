@@ -1,19 +1,20 @@
-require [[seawolf.variable]]
+local seawolf = require 'seawolf'.__build 'variable'
 local io, lpeg = io, require [[lpeg]]
 local require, string, table, type, pairs = require, string, table, type, pairs
 local rawset, is_array, tostring = rawset, seawolf.variable.is_array, tostring
-local empty = seawolf.variable.empty
+local empty, mmin = seawolf.variable.empty, math.min
 local pcall, dofile, floor, tconcat = pcall, dofile, math.floor, table.concat
-local print = print
+local print, tinsert, tremove = print, table.insert, table.remove
+local slen, ssub, sfind, slower = string.len, string.sub, string.find, string.lower
 
-module [[seawolf.text]]
+local m = {}
 
 -- Dependencies
 
 -- Split a string by another string
 -- Copied and adapted from http://luanet.net/lua/function/explode
 -- TODO: Improve performance
-function explode(delimiter, string_, limit)
+function m.explode(delimiter, string_, limit)
   string_ = string_ or [[]]
   if limit == 0 then limit = 1 end
 
@@ -24,7 +25,7 @@ function explode(delimiter, string_, limit)
 
   if limit and limit < 0 then
     for c = 1, limit*-1 do
-      table.remove(arr)
+      tremove(arr)
     end
   end
   return arr
@@ -32,7 +33,7 @@ end
 
 -- Strip whitespace (or other characters) from the end of a string
 -- Copied and adapted from http://lua-users.org/wiki/CommonFunctions
-function ltrim(str, charlist)
+function m.ltrim(str, charlist)
   charlist = charlist or '%s'
 
   return str:gsub('^[' .. charlist .. ']*', [[]])
@@ -40,7 +41,7 @@ end
 
 -- Strip whitespace (or other characters) from the beginning of a string
 -- Copied and adapted from http://lua-users.org/wiki/CommonFunctions
-function rtrim(s, pattern)
+function m.rtrim(s, pattern)
   pattern = pattern or [[%s]]
   local n = #s
   while n > 0 and s:find([[^]] .. pattern, n) do n = n - 1 end
@@ -49,7 +50,7 @@ end
 
 -- Remove leading and/or trailing spaces
 -- Copied and adapted from http://lua-users.org/wiki/StringTrim
-function trim(str, charlist)
+function m.trim(str, charlist)
   local lpeg = require [[lpeg]]
   if charlist == nil then
     charlist = lpeg.S(' \t\n\r\0\v')
@@ -61,10 +62,10 @@ end
 
 -- Return part of a string
 -- by Fernando P. García
-function substr(string_, start, length)
+function m.substr(string_, start, length)
   if length then
     if length < 0 then
-      length = string.len(string_) + length
+      length = slen(string_) + length
     else
       length = start + length - 1
     end
@@ -72,7 +73,7 @@ function substr(string_, start, length)
     length = -1
   end
 
-  return string.sub(string_, start, length)
+  return ssub(string_, start, length)
 end
 
 -- Helper function for str_replace
@@ -86,19 +87,19 @@ local function _str_replace(search, replace, subject, count)
   local pos, buf, len = 0, {}, 0
   count.v = 0
   len = #search
-  for st, sp in function() return string.find(subject, search, pos, true) end do -- for each match found
-    table.insert(buf, string.sub(subject, pos, st - 1)) -- Attach chars left of match
-    table.insert(buf, replace) -- Attach replacement string
+  for st, sp in function() return sfind(subject, search, pos, true) end do -- for each match found
+    tinsert(buf, ssub(subject, pos, st - 1)) -- Attach chars left of match
+    tinsert(buf, replace) -- Attach replacement string
     pos = sp + 1 -- Jump past current match
     count.v = count.v + 1
   end
-  table.insert(buf, subject:sub(pos)) -- Attach chars right of last match
-  return table.concat(buf), count.v
+  tinsert(buf, subject:sub(pos)) -- Attach chars right of last match
+  return tconcat(buf), count.v
 end
 
 -- Replace all occurrences of the search string with the replacement string
 -- by Fernando P. García
-function str_replace(search, replace, subject, count)
+function m.str_replace(search, replace, subject, count)
   count = count or {['v'] = 0}
 
   local s, k
@@ -124,7 +125,7 @@ end
 
 -- Translate certain characters
 -- by Fernando P. García
-function strtr(...)
+function m.strtr(...)
   local arg = {...}
   local str, from, to, replace_pairs
   str = arg[1] or [[]]
@@ -144,10 +145,10 @@ end
 
 -- Find position of first occurrence of a string
 -- by Fernando P. García
-function strpos(haystack, needle, offset)
+function m.strpos(haystack, needle, offset)
   offset = offset or 1
   local start, end_ = nil, nil
-  start, end_ = string.find(haystack, needle, offset, true)
+  start, end_ = sfind(haystack, needle, offset, true)
   return start and start - 1 or false
 end
 
@@ -155,7 +156,7 @@ ENT_QUOTES = 2
 ENT_COMPAT = 3
 -- Convert special characters to HTML entities
 -- Copied and adapted from http://lua-users.org/lists/lua-l/2008-01/msg00125.html
-function htmlspecialchars(string_, quote_style)
+function m.htmlspecialchars(string_, quote_style)
   quote_style = quote_style or 2
 
   local output
@@ -179,7 +180,7 @@ end
 
 -- Find position of last occurrence of a char in a string
 -- by Fernando P. Garcia
-function strrpos(haystack, needle, offset)
+function m.strrpos(haystack, needle, offset)
   offset = offset or 0
 
   local last
@@ -188,7 +189,7 @@ function strrpos(haystack, needle, offset)
   repeat
     last = pos
     offset = last
-    pos = string.find(haystack, needle, offset + 1, true)
+    pos = sfind(haystack, needle, offset + 1, true)
   until pos == nil
 
   return last
@@ -199,8 +200,8 @@ end
 local function splitbynum(s)
   local result = {}
   for x, y in (s or [[]]):gmatch([[(%d*)(%D*)]]) do
-    if x ~= [[]] then table.insert(result, tonumber(x)) end
-    if y ~= [[]] then table.insert(result, y) end
+    if x ~= [[]] then tinsert(result, tonumber(x)) end
+    if y ~= [[]] then tinsert(result, y) end
   end
   return result
 end
@@ -208,9 +209,9 @@ end
 -- Case insensitive string comparisons using a "natural order" algorithm
 -- Adapted from http://www.davekoelle.com/files/alphanum.lua (C) Andre Bogus
 -- by Fernando P. García
-function strnatcasecmp(str1, str2)
-  str1 = string.lower(str1) or [[]]
-  str2 = string.lower(str2) or [[]]
+function m.strnatcasecmp(str1, str2)
+  str1 = slower(str1) or [[]]
+  str2 = slower(str2) or [[]]
 
   local xt, yt, i, xe, ye
 
@@ -219,7 +220,7 @@ function strnatcasecmp(str1, str2)
   end
 
   xt, yt = splitbynum(str1), splitbynum(str2)
-  for i = 1, math.min(#xt, #yt) do
+  for i = 1, mmin(#xt, #yt) do
     xe, ye = xt[i], yt[i]
     if type(xe) == [[string]] then ye = tostring(ye)
     elseif type(ye) == [[string]] then xe = tostring(xe) end
@@ -229,25 +230,15 @@ function strnatcasecmp(str1, str2)
   return #xt < #yt and -1 or 1
 end
 
--- Calculate the md5 hash of a string
--- by Fernando P. García
-do
-  local lib_md5
-  function md5(str)
-    if lib_md5 == nil then lib_md5 = require [[md5]] end
-    return lib_md5.sumhexa(str)
-  end
-end
-
 -- Join array elements with a string
 -- by Fernando P. García
-function implode(glue, pieces)
+function m.implode(glue, pieces)
   local i
   local t = {}
   for _, i in pairs(pieces) do
-    table.insert(t, i)
+    tinsert(t, i)
   end
-  return table.concat(t, glue)
+  return tconcat(t, glue)
 end
 
 do
@@ -256,31 +247,31 @@ do
 
     by LU324_ and DigitalKiwi.
   ]]
-  function str2map(s)
+  function m.str2map(s)
     local map, rmap, i = {}, {}, 0
     for c in (s):gmatch('.') do
       i = i + 1
-      map[i] = c
+      map[i] = c1
       rmap[c] = i
     end
     return map, i, rmap
   end
 
   -- Default string map and maplen for int2strmap()
-  local default_map, default_maplen, default_rmap = str2map('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+  local default_map, default_maplen, default_rmap = m.str2map '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
   --[[
     Convert given integer to alphanumeric.
 
     by LU324_ and q66 (Copied and adapted from http://lua-users.org/lists/lua-l/2004-09/msg00054.html).
   ]]
-  function int2strmap(IN, map)
+  function m.int2strmap(IN, map)
     local buffer, i, d, maplen = {}, 0
 
     if map == nil then
       map, maplen = default_map, default_maplen
     else
-      map, maplen = str2map(map)
+      map, maplen = m.str2map(map)
     end
 
     while IN > 0 do
@@ -297,13 +288,13 @@ do
   --[[
     Convert given string to integer by (optional) given string map.
   ]]
-  function str2intmap(str, map)
+  function m.str2intmap(str, map)
     local buffer, int, i, rmap, maplen = {}, 0, #str
 
     if map == nil then
       rmap, maplen = default_rmap, default_maplen
     else
-      map, maplen, rmap = str2map(map)
+      map, maplen, rmap = m.str2map(map)
     end
 
     for c in (str):gmatch('.') do
@@ -314,3 +305,5 @@ do
     return int
   end
 end
+
+return m

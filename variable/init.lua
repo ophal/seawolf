@@ -3,7 +3,8 @@ local
   type, string, table, tostring, print, next, getmetatable, pairs
 local
   setmetatable, rawset, rawget = setmetatable, rawset, rawget
-module('seawolf.variable')
+
+local m = {}
 
 -- PHP Array emulator
 -- by Fernando P. García
@@ -87,6 +88,7 @@ do
         args[3] = args[2]
         args[2] = #args[1] + 1
       end
+
       Array.set(unpack(args))
     end,
 
@@ -150,11 +152,11 @@ end
 
 -- Prints human-readable information about a variable
 -- Copied and adapted from https://dev.mobileread.com/trac/luailiad/browser/trunk/experiments/XX/print_r.lua?rev=42
-function print_r (expression, return_)
-  return_ = not empty(return_)
+function m.print_r(expression, return_)
+  return_ = not m.empty(return_)
 
   local tableList, output = {}, {}
-  function table_r (t, name, indent, full)
+  function table_r(t, name, indent, full)
     local serial = (string.len(full) == 0) and
         (name or '') or
         type(name)~= 'number' and  
@@ -194,13 +196,13 @@ end
 
 -- Return true if the given function has been defined
 -- by Fernando P. García
-function function_exists(function_)
+function m.function_exists(function_)
   return type(_G[function_]) == 'function'
 end
 
 -- Checks if the given key or index exists in the array
 -- by Fernando P. García
-function array_key_exists(key, array)
+function m.array_key_exists(key, array)
   if is_array(array) then
     return not (array[key] == nil)
   end
@@ -209,14 +211,14 @@ end
 
 -- Finds whether a variable is an array
 -- by Fernando P. García
-function is_array(var)
+function m.is_array(var)
  return type(var) == 'table'
 end
 
 -- Emulate array_reverse of PHP
 -- by by Philippe Lhoste
 -- Copied and adapted from http://phi.lho.free.fr/programming/TestLuaArray.lua.htmlhttp://phi.lho.free.fr/programming/TestLuaArray.lua.html
-function array_reverse(t)
+function m.array_reverse(t)
   local l = table.getn(t) -- table length
   local j = l
   for i = 1, l / 2 do
@@ -229,7 +231,7 @@ end
 -- Emulate array_slice of PHP
 -- by Philippe Lhoste
 -- Copied and adapted from http://phi.lho.free.fr/programming/TestLuaArray.lua.htmlhttp://phi.lho.free.fr/programming/TestLuaArray.lua.html
-function array_slice(t, startPos, endPos)
+function m.array_slice(t, startPos, endPos)
   local tableSize = #t -- Table size
   if endPos == nil then
     -- Only one parameter: extract to end of table
@@ -252,19 +254,19 @@ end
 
 -- Implementation of is_numeric function
 -- TODO: review http://www.gammon.com.au/forum/bbshowpost.php?bbsubject_id=9271
-function is_numeric(p)
-  return not empty(tonumber(p))
+function m.is_numeric(p)
+  return not m.empty(tonumber(p))
 end
 
 -- Call a user function given by the first parameter
 -- by Fernando P. García
-function call_user_func(function_, ...)
+function m.call_user_func(function_, ...)
   return _G[function_](...)
 end
 
 -- Call a user function given with an array of parameters
 -- by Fernando P. García
-function call_user_func_array(function_, args)
+function m.call_user_func_array(function_, args)
   args = args or {}
   if _G[function_] ~= nil then
     return _G[function_](unpack(args))
@@ -275,7 +277,7 @@ end
 
 -- Exchanges all keys with their associated values in an array
 -- by Fernando P. García
-function array_flip(trans)
+function m.array_flip(trans)
   local out, key, value = {}
 
   for key, value in pairs(trans) do
@@ -302,8 +304,8 @@ end
 
 -- Pop the element off the beginning of array
 -- by Fernando P. García
-function array_shift(array)
-  if type(array) == [[table]] and not empty(array) then
+function m.array_shift(array)
+  if type(array) == [[table]] and not m.empty(array) then
     if getmetatable(array) == Array then
       return Array.shift(array)
     else
@@ -314,7 +316,7 @@ end
 
 -- Shift an element off the end of array
 -- by Fernando P. García
-function array_pop(array)
+function m.array_pop(array)
   if type(array) == [[table]] and not empty(array) then
     if getmetatable(array) == Array then
       return Array.remove(array)
@@ -326,7 +328,7 @@ end
 
 -- Searches the array for a given value and returns the corresponding key if successful
 -- by Fernando P. García
-function array_search(needle, array)
+function m.array_search(needle, array)
   local key, value
 
   for key, value in pairs(array) do
@@ -340,14 +342,14 @@ end
 
 -- Fetch a key from an array
 -- by Fernando P. García
-function key(array)
+function m.key(array)
   -- WARNING! This implementation returns just the FIRST key of given array
   return select(1, next(array))
 end
 
 -- Computes the difference of arrays
 -- by Fernando P. García
-function array_diff(...)
+function m.array_diff(...)
   local t1, pos, ot, new
   local arg = {...}; arg.n = #arg
 
@@ -391,7 +393,7 @@ do
        [ [[]]] = true,
        [ [[0]]] = true,
    }
-   function empty (var)
+   function m.empty (var)
        return not var or falses[var] or (type(var) == [[table]] and next(var)==nil)
    end
 end
@@ -435,11 +437,11 @@ end
 
 -- Merge one or more arrays
 -- by Fernando P. García
-function array_merge(...)
+function m.array_merge(...)
   local t1, pos, ot, new
   local arg = {...}; arg.n = #arg
 
-  t1 = array_shift(arg)
+  t1 = m.array_shift(arg)
   pos = 1
   while pos < arg.n do
     ot = arg[pos]
@@ -453,7 +455,7 @@ end
 
 -- Return all the keys of an array
 -- by Fernando P. García
-function array_keys(input, search_value, strict)
+function m.array_keys(input, search_value, strict)
   assert(type(input) == [[table]], [['bad argument #1 to 'array_keys' (table expected, got ]].. type(input) ..[[)]])
   assert(strict == nil, [[Parameter "strict" still not implement]])
   assert(search_value == nil, [[Parameter "search_value" still not implement]])
@@ -471,7 +473,7 @@ end
 
 -- Return all the keys of an array
 -- by Fernando P. García
-function array_values(array)
+function m.array_values(array)
   assert(type(array) == [[table]], [['bad argument #1 to 'array_values' (table expected, got ]].. type(array) ..[[)]])
 
   local val
@@ -487,7 +489,7 @@ end
 
 -- Fill an array with values
 -- by Fernando P. García
-function array_fill(start_index, num, value)
+function m.array_fill(start_index, num, value)
   local i
   local buf, c = {}, 0
 
@@ -502,13 +504,13 @@ end
 
 -- Sort an array by values using a user-defined comparison function
 -- by Fernando P. García
-function usort(array, cmp_function)
+function m.usort(array, cmp_function)
   table.sort(array, _G[cmp_function])
 end
 
 -- Prepend one or more elements to the beginning of an array
 -- by Fernando P. García
-function array_unshift(array, ...)
+function m.array_unshift(array, ...)
   local k, v
   local bkp, c = {}, 0
 
@@ -539,7 +541,7 @@ end
 
 -- Helper function for uasort()
 -- Copied and adapted from http://rosettacode.org/wiki/Quicksort#Lua
-function _uasort(array, keys, cmp_function, start, endi)
+local function _uasort(array, keys, cmp_function, start, endi)
   start, endi = start or 1, endi or #keys
   -- partition w.r.t. first element
   if endi - start < 1 then
@@ -565,7 +567,7 @@ function _uasort(array, keys, cmp_function, start, endi)
 end
 
 -- Sort an array with a user-defined comparison function and maintain index association
-function uasort(array, cmp_function)
+function m.uasort(array, cmp_function)
   local temp, k, v
 
   if _G[cmp_function] ~= nil then
@@ -576,7 +578,7 @@ end
 
 -- Push one or more elements onto the end of array
 -- by Fernando P. García
-function array_push(array, ...)
+function m.array_push(array, ...)
   local args, var
 
   if type(array) ~= 'table' then
@@ -595,11 +597,11 @@ end
 
 -- Merge two or more arrays recursively
 -- by Fernando P. García
-function array_merge_recursive(...)
+function m.array_merge_recursive(...)
   local t1, pos, ot, new
   local arg = {...}; arg.n = #arg
 
-  t1 = array_shift(arg)
+  t1 = m.array_shift(arg)
 
   pos = 1
   while pos < arg.n do
@@ -614,12 +616,12 @@ end
 
 -- Filters elements of an array using a callback function
 -- by Fernando P. García
-function array_filter(input, callback)
+function m.array_filter(input, callback)
   local t = Array.new()
 
   if callback == nil then
     callback = function (v)
-      return not empty(v)
+      return not m.empty(v)
     end
   else
     callback = _G[callback]
@@ -636,21 +638,21 @@ end
 
 -- Sort an array and maintain index association
 -- by Fernando P. Garcia
-function asort(t)
+function m.asort(t)
   table.sort(t)
 end
 
 -- Checks if a value exists in an array
 -- TODO: validate variables, deal with sub-tables
 -- by Fernando P. Garcia
-function in_array(needle, haystack)
+function m.in_array(needle, haystack)
   local out = {}
   out = array_flip(haystack)
   return out[needle]
 end
 
 -- Finds whether a variable is NULL
-function is_null(var)
+function m.is_null(var)
   return var == nil
 end
 
@@ -672,7 +674,7 @@ end
       end
 ]]
 _S = {} -- global place for static variables
-function static(pointer, value)
+function m.static(pointer, value)
   -- Read static variable
   if _S[pointer] == nil then
     -- Set default value
@@ -680,3 +682,307 @@ function static(pointer, value)
   end
   return _S[pointer]
 end
+
+--[[
+  Lua port of PHP serialization functions.
+  
+  Port based on PHPSerialize and PHPUnserialize by Scott Hurring
+  http://hurring.com/scott/code/python/serialize/v0.4
+  
+  @version v0.1 BETA
+  @author Fernando P. García; fernando at develcuy dot com
+  @copyright Copyright (c) 2009 Fernando P. García
+  @license http://opensource.org/licenses/gpl-license.php GNU Public License
+  
+  $Id$
+]]
+
+local _serialize_key, _read_chars, _read_until, _unknown_type
+
+function _serialize_key(data)
+  --[[
+  Serialize a key, which follows different rules than when 
+  serializing values.  Many thanks to Todd DeLuca for pointing 
+  out that keys are serialized differently than values!
+  
+  From http://us2.php.net/manual/en/language.types.array.php
+  A key may be either an integer or a string. 
+  If a key is the standard representation of an integer, it will be
+  interpreted as such (i.e. "8" will be interpreted as int 8,
+  while "08" will be interpreted as "08"). 
+  Floats in key are truncated to integer. 
+  ]]
+
+  -- Integer, Long, Float
+  if type(data) == 'number' then
+    return 'i:' .. tonumber(data) .. ';'
+
+  -- Boolean => integer
+  elseif type(data) == 'boolean' then
+    if data then
+      return 'i:1;'
+    else
+      return 'i:0;'
+    end
+
+  -- String => string or String => int (if string looks like int)
+  elseif type(data) == 'string' then
+    if tonumber(data) == nil then
+      return 's:' .. string.len(data) .. ':"' .. data .. '";'
+    else
+      return 'i:' .. tonumber(data) .. ';'
+    end
+  
+  -- None / NULL => empty string
+  elseif type(data) == 'nil' then
+    return 's:0:"";'
+  
+  -- I dont know how to serialize this
+  else
+    error('Unknown / Unhandled key  type (' .. type(data) .. ')!')
+  end
+end
+
+function m.serialize(data)
+  --[[
+  Serialize a value.
+  ]]
+
+  local i, out, key, value
+
+  -- Numbers
+  if type(data) == 'number' then
+    -- Integer => integer
+    if  math.floor(data) == data then
+      return 'i:' .. data .. ';'
+    -- Float, Long => double
+    else
+      return 'd:' .. data .. ';'
+    end
+
+  -- String => string or String => int (if string looks like int)
+  -- Thanks to Todd DeLuca for noticing that PHP strings that
+  -- look like integers are serialized as ints by PHP 
+  elseif type(data) == 'string' then
+    if tonumber(data) == nil then
+      return 's:' .. string.len(data) .. ':"' .. data .. '";'
+    else
+      return 'i:' .. tonumber(data) .. ';'
+    end
+
+  -- Nil / NULL
+  elseif type(data) == 'nil' then
+    return 'N;'
+
+  -- Tuple and List => array
+  -- The 'a' array type is the only kind of list supported by PHP.
+  -- array keys are automagically numbered up from 0
+  elseif type(data) == 'table' then
+    i = 0
+    out = {}
+    -- All arrays must have keys
+    for key, value in pairs(data) do
+      table.insert(out, _serialize_key(key))
+      table.insert(out, m.serialize(value))
+      i = i + 1
+    end
+    return 'a:' .. i .. ':{' .. table.concat(out) .. '}'
+
+  -- Boolean => bool
+  elseif type(data) == 'boolean' then
+    if data then
+      return 'b:1;'
+    else
+      return 'b:0;'
+    end
+
+  --~ TODO:
+  --~ -- Table + Functions => stdClass
+  --~ elseif type(data) == 'function' then
+
+  --~ # I dont know how to serialize this
+  else
+   error('Unknown / Unhandled data type (' .. type(data) .. ')!')
+  end
+end
+
+function _read_until(data, offset, stopchar)
+  --[[
+  Read from data[offset] until you encounter some char 'stopchar'.
+  ]]
+
+  local buf = {}
+  local char = string.sub(data, offset + 1, offset + 1)
+  local i = 2
+  while not (char == stopchar) do
+    -- Consumed all the characters and havent found ';'
+    if i + offset > string.len(data) then
+      error('Invalid')
+    end
+    table.insert(buf, char)
+    char = string.sub(data, offset + i, offset + i)
+    i = i + 1
+  end
+  -- (chars_read, data)
+  return i - 2, table.concat(buf)
+end
+
+function _read_chars(data, offset, length)
+  --[[
+  Read 'length' number of chars from data[offset].
+  ]]
+
+  local buf = {}, char
+  -- Account for the starting quote char
+  -- offset += 1
+  for i = 0, length -1 do
+    char = string.sub(data, offset + i, offset + i)
+    table.insert(buf, char)
+  end
+
+  -- (chars_read, data)
+  return length, table.concat(buf)
+end
+
+function m.unserialize(data, offset)
+  offset = offset or 0
+
+  --[[
+  Find the next token and unserialize it.
+  Recurse on array.
+
+  offset = raw offset from start of data
+  --]]
+
+  local buf, dtype, dataoffset, typeconvert, datalength, chars, readdata, i,
+         key, value, keys, properties, otchars, otype, property
+
+  buf = {}
+  dtype = string.lower(string.sub(data, offset + 1, offset + 1))
+
+  -- 't:' = 2 chars
+  dataoffset = offset + 2
+  typeconvert = function(x) return x end
+  datalength = 0
+  chars = datalength
+
+  -- int or double => Number
+  if dtype == 'i' or dtype == 'd' then
+    typeconvert = function(x) return tonumber(x) end
+    chars, readdata = _read_until(data, dataoffset, ';')
+    -- +1 for end semicolon
+    dataoffset = dataoffset + chars + 1
+
+  -- bool => Boolean
+  elseif dtype == 'b' then
+    typeconvert = function(x) return tonumber(x) == 1 end
+    chars, readdata = _read_until(data, dataoffset, ';')
+    -- +1 for end semicolon
+    dataoffset = dataoffset + chars + 1
+
+  -- n => None
+  elseif dtype == 'n' then
+    readdata = nil
+
+  -- s => String
+  elseif dtype == 's' then
+    chars, stringlength = _read_until(data, dataoffset, ':')
+    -- +2 for colons around length field
+    dataoffset = dataoffset + chars + 2
+
+    -- +1 for start quote
+    chars, readdata = _read_chars(data, dataoffset + 1, tonumber(stringlength))
+    -- +2 for endquote semicolon
+    dataoffset = dataoffset + chars + 2
+
+    --[[
+    TODO
+    review original: if chars != int(stringlength) != int(readdata):
+    ]]
+    if not (chars == tonumber(stringlength)) then
+      error('String length mismatch')
+    end
+
+  -- array => Table
+  -- If you originally serialized a Tuple or List, it will
+  -- be unserialized as a Dict.  PHP doesn't have tuples or lists,
+  -- only arrays - so everything has to get converted into an array
+  -- when serializing and the original type of the array is lost
+  elseif dtype == 'a' then
+    readdata = {}
+
+    -- How many keys does this list have?
+    chars, keys = _read_until(data, dataoffset, ':')
+    -- +2 for colons around length field
+    dataoffset = dataoffset + chars + 2
+
+    -- Loop through and fetch this number of key/value pairs
+    for i = 0, tonumber(keys) - 1 do
+      -- Read the key
+      key, ktype, kchars = m.unserialize(data, dataoffset)
+      dataoffset = dataoffset + kchars
+
+      -- Read value of the key
+      value, vtype, vchars = m.unserialize(data, dataoffset)
+      -- Cound ending bracket of nested array
+      if vtype == 'a' then
+        vchars = vchars + 1
+      end
+      dataoffset = dataoffset + vchars
+
+      -- Set the list element
+      readdata[key] = value
+    end
+  -- object => Table
+  elseif dtype == 'o' then
+    readdata = {}
+
+    -- How log is the type of this object?
+    chars, otchars = _read_until(data, dataoffset, ':')
+    dataoffset = dataoffset + chars + 2
+
+    -- Which type is this object?
+    otype = string.sub(data, dataoffset + 1, dataoffset + otchars)
+    dataoffset = dataoffset + otchars + 2
+
+    if otype == 'stdClass' then
+      -- How many properties does this list have?
+      chars, properties = _read_until(data, dataoffset, ':')
+
+      -- +2 for colons around length field
+      dataoffset = dataoffset + chars + 2
+
+      -- Loop through and fetch this number of key/value pairs
+      for i = 0, tonumber(properties) - 1 do
+        -- Read the key
+        property, ktype, kchars = unserialize(data, dataoffset)
+        dataoffset = dataoffset + kchars
+
+        -- Read value of the key
+        value, vtype, vchars = unserialize(data, dataoffset)
+        -- Cound ending bracket of nested array
+        if vtype == 'a' then
+          vchars = vchars + 1
+        end
+        dataoffset = dataoffset + vchars
+
+        -- Set the list element
+        readdata[property] = value
+      end
+    else
+      _unknown_type(dtype)
+    end
+  else
+    _unknown_type(dtype)
+  end
+
+  --~ return (dtype, dataoffset-offset, typeconvert(readdata))
+  return typeconvert(readdata), dtype, dataoffset - offset
+end
+
+-- I don't know how to unserialize this
+function _unknown_type(type_)
+  error('Unknown / Unhandled data type (' .. type_ .. ')!', 2)
+end
+
+return m

@@ -1,12 +1,15 @@
-require 'seawolf.text'
+local seawolf = require 'seawolf'.__build 'text'
 local string, require, substr = string, require, seawolf.text.substr
+local tinsert, tconcat, mfloor, tremove = table.insert, tconcat, math.floor, table.remove
+local ssub, slen, sformat = string.sub, string.len, string.format
+local odate, otime = os.date, os.time
 
-module 'seawolf.other'
+local m ={}
 
 -- Generate a unique ID
 -- Migrated from Drupy (authored by Brendon Crawford)
 -- by Fernando P. García
-function uniqid(prefix, more_entropy)
+function m.uniqid(prefix, more_entropy)
   if more_entropy == nil then more_entropy = false end
 
   local out, num, prefix, charmap, i, pos
@@ -22,16 +25,16 @@ function uniqid(prefix, more_entropy)
             '0123456789'
 
   for i = 1, num do
-    pos = math.floor(string.len(charmap) * MT_RAND_GENERATOR())
-    table.insert(out, string.sub(charmap, pos, pos))
+    pos = mfloor(slen(charmap) * MT_RAND_GENERATOR())
+    tinsert(out, ssub(charmap, pos, pos))
   end
 
-  return table.concat(out)
+  return tconcat(out)
 end
 
 -- Format a local time/date
 -- by Fernando P. García
-function date(format_, timestamp)
+function m.date(format_, timestamp)
   local t, d, gmd, gmt, date_, year, month, i, c
 
   t = {
@@ -75,24 +78,24 @@ function date(format_, timestamp)
     ['%'] = '%',
   }
 
-  d = os.date('*t', timestamp)
-  gmd = os.date('!*t', timestamp)
+  d = odate('*t', timestamp)
+  gmd = odate('!*t', timestamp)
   gmt = substr(format_, 1, 1) == '!'
 
   date_ = {}
-  for i = 1, string.len(format_) do
+  for i = 1, slen(format_) do
     c = substr(format_, i, 1)
     if c == 'z' or c == 'n' or c == 'G' then
-      table.insert(date_, tonumber(os.date((gmt and '!' or '') .. '%'.. t[c], timestamp)))
+      tinsert(date_, tonumber(odate((gmt and '!' or '') .. '%'.. t[c], timestamp)))
     elseif c == 't' then
-      table.insert(date_, os.date('*t', os.time{['year'] = d.year, ['month'] = d.month + 1, ['day'] = 0})['day'])
+      tinsert(date_, odate('*t', otime{['year'] = d.year, ['month'] = d.month + 1, ['day'] = 0})['day'])
     elseif c == 'L' then -- Leap year
-      table.insert(date_, (d.year % 4 == 0 and (d.year % 100 ~= 0 or d.year % 400 == 0)) and 1 or 0)
+      tinsert(date_, (d.year % 4 == 0 and (d.year % 100 ~= 0 or d.year % 400 == 0)) and 1 or 0)
     elseif c == 'I' then -- Leap year
       if gmt then
-        table.insert(date_, gmd.isdst and 1 or 0)
+        tinsert(date_, gmd.isdst and 1 or 0)
       else
-        table.insert(date_, d.isdst and 1 or 0)
+        tinsert(date_, d.isdst and 1 or 0)
       end
     elseif c == 'O' or c == 'P' then -- Difference to GMT
       tz = {['sep'] = c == 'P' and ':' or '', ['sign'] = '+'}
@@ -113,19 +116,19 @@ function date(format_, timestamp)
           tz.sign = '-'
         end
       end
-      table.insert(date_, string.format('%s%02d%s%02d', tz.sign, tz.hour, tz.sep, tz.min))
+      tinsert(date_, sformat('%s%02d%s%02d', tz.sign, tz.hour, tz.sep, tz.min))
     elseif c == 'Z' then -- Timezone offset in seconds
       if gmt then
-        table.insert(date_, 0)
+        tinsert(date_, 0)
       else
-        table.insert(date_, os.time(os.date('*t', timestamp)) - os.time(os.date('!*t', timestamp)))
+        tinsert(date_, otime(odate('*t', timestamp)) - otime(odate('!*t', timestamp)))
       end
     elseif c == 'c'  then -- ISO 8601 date
-      table.insert(date_, os.date((gmt and '!' or '') .. '%Y-%m-%dT%H:%M:%S', timestamp) .. date((gmt and '!' or '') .. 'P', timestamp))
+      tinsert(date_, odate((gmt and '!' or '') .. '%Y-%m-%dT%H:%M:%S', timestamp) .. m.date((gmt and '!' or '') .. 'P', timestamp))
     elseif c == 'r'  then -- ISO 8601 date
-      table.insert(date_, os.date((gmt and '!' or '') .. '%a, %e %b %Y %H:%M:%S ', timestamp) .. date((gmt and '!' or '') .. 'O', timestamp))
+      tinsert(date_, odate((gmt and '!' or '') .. '%a, %e %b %Y %H:%M:%S ', timestamp) .. m.date((gmt and '!' or '') .. 'O', timestamp))
     elseif c == 'B' then -- Swatch Internet Time
-      table.insert(date_, math.floor(((((
+      tinsert(date_, mfloor(((((
           gmd.sec/60 -- Seconds to Minutes
         + gmd.min)/60 -- Minutes to Hours
         + gmd.hour)/24) -- Hours to Days
@@ -133,21 +136,21 @@ function date(format_, timestamp)
         * 1000 -- .beats in one Day
       ))
     elseif c == 'U' then -- Seconds since the Unix Epoch
-      table.insert(date_, os.date('%s', timestamp))
+      tinsert(date_, odate('%s', timestamp))
     elseif t[c] then
-      table.insert(date_, '%'.. t[c])
+      tinsert(date_, '%'.. t[c])
     else
-      table.insert(date_, c)
+      tinsert(date_, c)
     end
   end
 
-  return os.date(table.concat(date_), timestamp)
+  return odate(tconcat(date_), timestamp)
 end
 
 -- Format a GMT/UTC date/time
 -- by Fernando P. García
-function gmdate(format_, timestamp)
-  return date('!'.. format_, timestamp)
+function m.gmdate(format_, timestamp)
+  return m.date('!'.. format_, timestamp)
 end
 
 IMAGETYPE_GIF = 1
@@ -197,48 +200,48 @@ local function ob_print(data)
       data = 'Array'
       --~ error('invalid value (table) at index 1 in table for \'ob_print\'')
     end
-    table.insert(_OB_BUFFER[2], data)
+    tinsert(_OB_BUFFER[2], data)
   end
 end
 
 -- Turn on output buffering
 -- by Fernando P. García
-function ob_start()
+function m.ob_start()
   local caller = debug.getinfo(2, [[n]])
   _OB_ENV = getfenv(_G[caller.name])
   _OB_ENV.print = ob_print
-  table.insert(_OB_BUFFER, {_OB_BUFFER, {}})
+  tinsert(_OB_BUFFER, {_OB_BUFFER, {}})
   _OB_BUFFER = _OB_BUFFER[#_OB_BUFFER]
 end
 
 -- Return the contents of the output buffer
 -- by Fernando P. García
-function ob_get_contents()
+function m.ob_get_contents()
   if _OB_ENV.print == ob_print then
-    return table.concat(_OB_BUFFER[2])
+    return tconcat(_OB_BUFFER[2])
   end
   return false
 end
 
 -- Flush (send) the output buffer and turn off output buffering
 -- by Fernando P. García
-function ob_end_flush()
+function m.ob_end_flush()
   if #_OB_BUFFER > 0 and (_OB_ENV.print == ob_print or #_OB_BUFFER[2] > 0) then
     ob_flush()
-    return ob_end_clean()
+    return m.ob_end_clean()
   end
   return false
 end
 
 -- Flush (send) the output buffer
 -- by Fernando P. García
-function ob_flush()
-  _PRINT_FUNCTION(table.concat(_OB_BUFFER[2]))
+function m.ob_flush()
+  _PRINT_FUNCTION(tconcat(_OB_BUFFER[2]))
 end
 
 -- Clean (erase) the output buffer and turn off output buffering
 -- by Fernando P. García
-function ob_end_clean()
+function m.ob_end_clean()
   if #_OB_BUFFER > 0 then
     _OB_BUFFER = _OB_BUFFER[1] -- point to parent buffer
 
@@ -247,7 +250,7 @@ function ob_end_clean()
       _OB_ENV.print = _PRINT_FUNCTION
     end
 
-    table.remove(_OB_BUFFER) -- remove children buffer
+    tremove(_OB_BUFFER) -- remove children buffer
     return true
   end
   return false
@@ -255,14 +258,14 @@ end
 
 -- Get current buffer contents and delete current output buffer
 -- by Fernando P. García
-function ob_get_clean()
-  local output = ob_get_contents()
-  ob_end_clean()
+function m.ob_get_clean()
+  local output = m.ob_get_contents()
+  m.ob_end_clean()
   return output
 end
 
 -- Copied and adapted from http://lua-users.org/wiki/CopyTable
-function clone(object)
+function m.clone(object)
   local lookup_table = {}
   local function _copy(object)
     if type(object) ~= "table" then
@@ -281,7 +284,7 @@ function clone(object)
 end
 
 -- Flush the output buffer
-function flush()
+function m.flush()
  -- TODO: Implement buffering for performance
 end
 
@@ -321,3 +324,5 @@ do
     end
   end
 end
+
+return m

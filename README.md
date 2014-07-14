@@ -3,7 +3,7 @@ Seawolf is a toolkit library, it implements several handy functions to make Opha
 ### Dependencies
 Seawolf packages reuse Lua modules that are helpful for web development.
 
-* [Lua MD5](http://www.keplerproject.org/md5)
+* [lsha2](http://github.com/develCuy/lsha2)
 * [lrandom](http://www.tecgraf.puc-rio.br/~lhf/ftp/lua/#lrandom)
 * [luuid](http://www.tecgraf.puc-rio.br/~lhf/ftp/lua/#luuid)
 * [lrexlib-pcre](http://lrexlib.luaforge.net) **(optional)**
@@ -35,4 +35,4 @@ NOTICE: some functions may be deprecated and/or replaced over time, in aims of i
   array_diff, array_fill, array_flip, array_key_exists, array_keys, array_merge, array_pop, array_reverse, array_search, array_shift, array_slice, array_unshift, call_user_func, call_user_func_array, empty, function_exists, is_array, is_numeric, is_null, key, print_r, serialize, unserialize, usort, is_numeric, array_push, array_merge_recursive, array_filter, asort, uasort, static
 
 * **Other**
-  clone, date, flush, gmdate, getimagesize, in_array, ob_print, ob_start, ob_get_contents, ob_end_flush, ob_flush, ob_end_clean, ob_get_clean, uniqid
+  clone, date, flush, gmdate, getimagesize, in_array, ob_print, ob_start, ob_get_contents, ob_end_flush, ob_flush, ob_end_clean, ob_get_clean, uniqid, hash
