@@ -21,6 +21,7 @@ dependencies = {
 build = {
   type = 'builtin',
   modules = {
+    ['seawolf'] = 'init.lua',
     ['seawolf.behaviour'] = 'behaviour/init.lua',
     ['seawolf.calendar'] = 'calendar/init.lua',
     ['seawolf.contrib'] = 'contrib/init.lua',
