@@ -1,5 +1,5 @@
 package = 'seawolf'
-version = '0.8-0'
+version = '1.0-0'
 source = {
   url = 'git://github.com/ophal/seawolf.git',
   tag = 'master',
@@ -32,6 +32,5 @@ build = {
     ['seawolf.text'] = 'text/init.lua',
     ['seawolf.text.preg'] = 'text/preg.lua',
     ['seawolf.variable'] = 'variable/init.lua',
-    ['seawolf.variable.serialize'] = 'variable/serialize/init.lua',
   },
 }
