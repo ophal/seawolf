@@ -153,4 +153,20 @@ function m.table_insert_multiple(t, rows)
   end
 end
 
+-- Helper metatable
+m.metahelper = {
+  __index = function(t, k)
+    local meta = m.metahelper
+    if meta[k] ~= nil then
+      return meta[k]
+    end
+  end,
+
+  shift = m.table_shift,
+  concat = m.table_concat,
+  print = m.table_print,
+  dump = m.table_dump,
+  insert_multiple = m.table_insert_multiple,
+}
+
 return m
