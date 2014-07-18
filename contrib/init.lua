@@ -146,4 +146,11 @@ do
   end
 end
 
+-- Insert each item from rows into the target table
+function m.table_insert_multiple(t, rows)
+  for _, v in pairs(rows) do
+    t[#t+1] = v
+  end
+end
+
 return m
