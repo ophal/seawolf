@@ -647,7 +647,7 @@ end
 -- by Fernando P. Garcia
 function m.in_array(needle, haystack)
   local out = {}
-  out = array_flip(haystack)
+  out = m.array_flip(haystack)
   return out[needle]
 end
 
