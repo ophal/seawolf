@@ -314,7 +314,7 @@ do
     },
   }
 
-  function hash(algo, data, raw_output)
+  function m.hash(algo, data, raw_output)
     if raw_output == nil then raw_output = false end
 
     if _hash[algo] then
