@@ -16,6 +16,7 @@ dependencies = {
   'lpeg',
   'luasocket',
   'luafilesystem',
+  'md5',
   'lsha2',
   'luuid = 20120501-1',
 }

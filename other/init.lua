@@ -292,27 +292,31 @@ end
 -- by Fernando P. Garcia
 do
   local _hash = {
-    md5 = {
-      [true] = require 'md5'.sum,
-      [false] = require 'md5'.sumhexa,
-    },
-    sha224 = {
-      [true] = function() end,
-      [false] = require 'lsha2'.hash224,
-    },
-    sha256 = {
-      [true] = require 'sha2'.sha256hex,
-      [false] = require 'lsha2'.hash256,
-    },
-    sha384 = {
-      [true] = require 'sha2'.sha384,
-      [false] = require 'sha2'.sha384hex,
-    },
-    sha512 = {
-      [true] = require 'sha2'.sha512,
-      [false] = require 'sha2'.sha512hex,
-    },
+    md5 = {},
+    sha224 = {},
+    sha256 = {},
+    sha384 = {},
+    sha512 = {},
   }
+
+  _hash.md5[false] = require 'md5'.sumhexa
+  _hash.md5[true] = require 'md5'.sum
+
+  _hash.sha224[false] = require 'lsha2'.hash224
+  _hash.sha224[true] = function() end
+
+  _hash.sha256[false] = require 'lsha2'.hash256
+
+  local work, rs = pcall(require, 'sha2')
+  if work then
+    _hash.sha256[true] = require 'sha2'.sha256hex
+
+    _hash.sha384[false] = require 'sha2'.sha384hex
+    _hash.sha384[true] = require 'sha2'.sha384
+
+    _hash.sha384[false] = require 'sha2'.sha512hex
+    _hash.sha384[true] = require 'sha2'.sha512
+  end
 
   function m.hash(algo, data, raw_output)
     if raw_output == nil then raw_output = false end
