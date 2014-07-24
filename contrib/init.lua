@@ -155,6 +155,23 @@ function _M.table_insert_multiple(t, rows)
   end
 end
 
+-- Insert given value 'v' to the end of table 't' ignoring metatable methods
+function _M.table_append(t, v)
+  t[#t + 1] = v
+end
+
+-- Creates a new table with metatable set to _M.metahelper
+-- If table passed as argument, only assigns the metatable
+function _M.seawolf_table(t)
+  if t == nil then
+    t = {}
+  end
+
+  setmetatable(t, _M.metahelper)
+
+  return t
+end
+
 -- Helper metatable
 _M.metahelper = {
   __index = function(t, k)
@@ -169,6 +186,7 @@ _M.metahelper = {
   print = _M.table_print,
   dump = _M.table_dump,
   insert_multiple = _M.table_insert_multiple,
+  append = _M.table_append,
 }
 
 return _M
