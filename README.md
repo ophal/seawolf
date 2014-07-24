@@ -11,6 +11,7 @@ Seawolf packages reuse Lua modules that are helpful for web development.
 * [lua-imlib2](http://asbradbury.org/projects/lua-imlib2) **(optional)**
 * [LuaSocket](http://luasocket.luaforge.net)
 * [LuaSQL](http://www.keplerproject.org/luasql) **(optional)**
+* [lua-magic](https://github.com/mah0x211/lua-magic) **(optional)**
 
 
 ### Functions by package

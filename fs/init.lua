@@ -227,4 +227,12 @@ function _M.safe_close(filepath, sign)
   end
 end
 
+-- Embed the lua-magic library
+do
+  local status, result = pcall(require, 'magic')
+  if status then
+    _M.finfo = result
+  end
+end
+
 return _M
