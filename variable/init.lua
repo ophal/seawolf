@@ -4,7 +4,7 @@ local
 local
   setmetatable, rawset, rawget = setmetatable, rawset, rawget
 
-local m = {}
+local _M = {}
 
 -- PHP Array emulator
 -- by Fernando P. García
@@ -152,8 +152,8 @@ end
 
 -- Prints human-readable information about a variable
 -- Copied and adapted from https://dev.mobileread.com/trac/luailiad/browser/trunk/experiments/XX/print_r.lua?rev=42
-function m.print_r(expression, return_)
-  return_ = not m.empty(return_)
+function _M.print_r(expression, return_)
+  return_ = not _M.empty(return_)
 
   local tableList, output = {}, {}
   function table_r(t, name, indent, full)
@@ -196,13 +196,13 @@ end
 
 -- Return true if the given function has been defined
 -- by Fernando P. García
-function m.function_exists(function_)
+function _M.function_exists(function_)
   return type(_G[function_]) == 'function'
 end
 
 -- Checks if the given key or index exists in the array
 -- by Fernando P. García
-function m.array_key_exists(key, array)
+function _M.array_key_exists(key, array)
   if is_array(array) then
     return not (array[key] == nil)
   end
@@ -211,14 +211,14 @@ end
 
 -- Finds whether a variable is an array
 -- by Fernando P. García
-function m.is_array(var)
+function _M.is_array(var)
  return type(var) == 'table'
 end
 
 -- Emulate array_reverse of PHP
 -- by by Philippe Lhoste
 -- Copied and adapted from http://phi.lho.free.fr/programming/TestLuaArray.lua.htmlhttp://phi.lho.free.fr/programming/TestLuaArray.lua.html
-function m.array_reverse(t)
+function _M.array_reverse(t)
   local l = table.getn(t) -- table length
   local j = l
   for i = 1, l / 2 do
@@ -231,7 +231,7 @@ end
 -- Emulate array_slice of PHP
 -- by Philippe Lhoste
 -- Copied and adapted from http://phi.lho.free.fr/programming/TestLuaArray.lua.htmlhttp://phi.lho.free.fr/programming/TestLuaArray.lua.html
-function m.array_slice(t, startPos, endPos)
+function _M.array_slice(t, startPos, endPos)
   local tableSize = #t -- Table size
   if endPos == nil then
     -- Only one parameter: extract to end of table
@@ -253,20 +253,20 @@ function m.array_slice(t, startPos, endPos)
 end
 
 -- Implementation of is_numeric function
--- TODO: review http://www.gammon.com.au/forum/bbshowpost.php?bbsubject_id=9271
-function m.is_numeric(p)
-  return not m.empty(tonumber(p))
+-- TODO: review http://www.gammon.co_M.au/forum/bbshowpost.php?bbsubject_id=9271
+function _M.is_numeric(p)
+  return not _M.empty(tonumber(p))
 end
 
 -- Call a user function given by the first parameter
 -- by Fernando P. García
-function m.call_user_func(function_, ...)
+function _M.call_user_func(function_, ...)
   return _G[function_](...)
 end
 
 -- Call a user function given with an array of parameters
 -- by Fernando P. García
-function m.call_user_func_array(function_, args)
+function _M.call_user_func_array(function_, args)
   args = args or {}
   if _G[function_] ~= nil then
     return _G[function_](unpack(args))
@@ -277,7 +277,7 @@ end
 
 -- Exchanges all keys with their associated values in an array
 -- by Fernando P. García
-function m.array_flip(trans)
+function _M.array_flip(trans)
   local out, key, value = {}
 
   for key, value in pairs(trans) do
@@ -304,8 +304,8 @@ end
 
 -- Pop the element off the beginning of array
 -- by Fernando P. García
-function m.array_shift(array)
-  if type(array) == [[table]] and not m.empty(array) then
+function _M.array_shift(array)
+  if type(array) == [[table]] and not _M.empty(array) then
     if getmetatable(array) == Array then
       return Array.shift(array)
     else
@@ -316,7 +316,7 @@ end
 
 -- Shift an element off the end of array
 -- by Fernando P. García
-function m.array_pop(array)
+function _M.array_pop(array)
   if type(array) == [[table]] and not empty(array) then
     if getmetatable(array) == Array then
       return Array.remove(array)
@@ -328,7 +328,7 @@ end
 
 -- Searches the array for a given value and returns the corresponding key if successful
 -- by Fernando P. García
-function m.array_search(needle, array)
+function _M.array_search(needle, array)
   local key, value
 
   for key, value in pairs(array) do
@@ -342,14 +342,14 @@ end
 
 -- Fetch a key from an array
 -- by Fernando P. García
-function m.key(array)
+function _M.key(array)
   -- WARNING! This implementation returns just the FIRST key of given array
   return select(1, next(array))
 end
 
 -- Computes the difference of arrays
 -- by Fernando P. García
-function m.array_diff(...)
+function _M.array_diff(...)
   local t1, pos, ot, new
   local arg = {...}; arg.n = #arg
 
@@ -393,7 +393,7 @@ do
        [ [[]]] = true,
        [ [[0]]] = true,
    }
-   function m.empty (var)
+   function _M.empty (var)
        return not var or falses[var] or (type(var) == [[table]] and next(var)==nil)
    end
 end
@@ -437,11 +437,11 @@ end
 
 -- Merge one or more arrays
 -- by Fernando P. García
-function m.array_merge(...)
+function _M.array_merge(...)
   local t1, pos, ot, new
   local arg = {...}; arg.n = #arg
 
-  t1 = m.array_shift(arg)
+  t1 = _M.array_shift(arg)
   pos = 1
   while pos < arg.n do
     ot = arg[pos]
@@ -455,7 +455,7 @@ end
 
 -- Return all the keys of an array
 -- by Fernando P. García
-function m.array_keys(input, search_value, strict)
+function _M.array_keys(input, search_value, strict)
   assert(type(input) == [[table]], [['bad argument #1 to 'array_keys' (table expected, got ]].. type(input) ..[[)]])
   assert(strict == nil, [[Parameter "strict" still not implement]])
   assert(search_value == nil, [[Parameter "search_value" still not implement]])
@@ -473,7 +473,7 @@ end
 
 -- Return all the keys of an array
 -- by Fernando P. García
-function m.array_values(array)
+function _M.array_values(array)
   assert(type(array) == [[table]], [['bad argument #1 to 'array_values' (table expected, got ]].. type(array) ..[[)]])
 
   local val
@@ -489,7 +489,7 @@ end
 
 -- Fill an array with values
 -- by Fernando P. García
-function m.array_fill(start_index, num, value)
+function _M.array_fill(start_index, num, value)
   local i
   local buf, c = {}, 0
 
@@ -504,13 +504,13 @@ end
 
 -- Sort an array by values using a user-defined comparison function
 -- by Fernando P. García
-function m.usort(array, cmp_function)
+function _M.usort(array, cmp_function)
   table.sort(array, _G[cmp_function])
 end
 
 -- Prepend one or more elements to the beginning of an array
 -- by Fernando P. García
-function m.array_unshift(array, ...)
+function _M.array_unshift(array, ...)
   local k, v
   local bkp, c = {}, 0
 
@@ -567,7 +567,7 @@ local function _uasort(array, keys, cmp_function, start, endi)
 end
 
 -- Sort an array with a user-defined comparison function and maintain index association
-function m.uasort(array, cmp_function)
+function _M.uasort(array, cmp_function)
   local temp, k, v
 
   if _G[cmp_function] ~= nil then
@@ -578,7 +578,7 @@ end
 
 -- Push one or more elements onto the end of array
 -- by Fernando P. García
-function m.array_push(array, ...)
+function _M.array_push(array, ...)
   local args, var
 
   if type(array) ~= 'table' then
@@ -597,11 +597,11 @@ end
 
 -- Merge two or more arrays recursively
 -- by Fernando P. García
-function m.array_merge_recursive(...)
+function _M.array_merge_recursive(...)
   local t1, pos, ot, new
   local arg = {...}; arg.n = #arg
 
-  t1 = m.array_shift(arg)
+  t1 = _M.array_shift(arg)
 
   pos = 1
   while pos < arg.n do
@@ -616,12 +616,12 @@ end
 
 -- Filters elements of an array using a callback function
 -- by Fernando P. García
-function m.array_filter(input, callback)
+function _M.array_filter(input, callback)
   local t = Array.new()
 
   if callback == nil then
     callback = function (v)
-      return not m.empty(v)
+      return not _M.empty(v)
     end
   else
     callback = _G[callback]
@@ -638,21 +638,21 @@ end
 
 -- Sort an array and maintain index association
 -- by Fernando P. Garcia
-function m.asort(t)
+function _M.asort(t)
   table.sort(t)
 end
 
 -- Checks if a value exists in an array
 -- TODO: validate variables, deal with sub-tables
 -- by Fernando P. Garcia
-function m.in_array(needle, haystack)
+function _M.in_array(needle, haystack)
   local out = {}
-  out = m.array_flip(haystack)
+  out = _M.array_flip(haystack)
   return out[needle]
 end
 
 -- Finds whether a variable is NULL
-function m.is_null(var)
+function _M.is_null(var)
   return var == nil
 end
 
@@ -674,7 +674,7 @@ end
       end
 ]]
 _S = {} -- global place for static variables
-function m.static(pointer, value)
+function _M.static(pointer, value)
   -- Read static variable
   if _S[pointer] == nil then
     -- Set default value
@@ -743,7 +743,7 @@ function _serialize_key(data)
   end
 end
 
-function m.serialize(data)
+function _M.serialize(data)
   --[[
   Serialize a value.
   ]]
@@ -783,7 +783,7 @@ function m.serialize(data)
     -- All arrays must have keys
     for key, value in pairs(data) do
       table.insert(out, _serialize_key(key))
-      table.insert(out, m.serialize(value))
+      table.insert(out, _M.serialize(value))
       i = i + 1
     end
     return 'a:' .. i .. ':{' .. table.concat(out) .. '}'
@@ -844,7 +844,7 @@ function _read_chars(data, offset, length)
   return length, table.concat(buf)
 end
 
-function m.unserialize(data, offset)
+function _M.unserialize(data, offset)
   offset = offset or 0
 
   --[[
@@ -919,11 +919,11 @@ function m.unserialize(data, offset)
     -- Loop through and fetch this number of key/value pairs
     for i = 0, tonumber(keys) - 1 do
       -- Read the key
-      key, ktype, kchars = m.unserialize(data, dataoffset)
+      key, ktype, kchars = _M.unserialize(data, dataoffset)
       dataoffset = dataoffset + kchars
 
       -- Read value of the key
-      value, vtype, vchars = m.unserialize(data, dataoffset)
+      value, vtype, vchars = _M.unserialize(data, dataoffset)
       -- Cound ending bracket of nested array
       if vtype == 'a' then
         vchars = vchars + 1
@@ -985,4 +985,4 @@ function _unknown_type(type_)
   error('Unknown / Unhandled data type (' .. type_ .. ')!', 2)
 end
 
-return m
+return _M

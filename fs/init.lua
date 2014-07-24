@@ -8,22 +8,22 @@ local tconcat, tremove = table.concat, table.remove
 -- src/loadlib.c in your lua source tree for reference
 local LUA_DIRSEP = string.sub(package.config,1,1)
 
-local m = {}
+local _M = {}
 
 -- Returns directory name component of path
 -- Copied and adapted from http://dev.alpinelinux.org/alpine/acf/core/acf-core-0.4.20.tar.bz2/acf-core-0.4.20/lib/fs.lua
-function m.dirname(string_)
+function _M.dirname(string_)
   string_ = string_ or [[]]
   -- strip trailing / first
   string_ = string.gsub(string_, LUA_DIRSEP .. [[$]], [[]])
-  local basename = m.basename(string_)
+  local basename = _M.basename(string_)
   string_ = string.sub(string_, 1, #string_ - #basename - 1)
   return(string_)  
 end
 
 -- Returns string with any leading directory components removed. If specified, also remove a trailing suffix. 
 -- Copied and adapted from http://dev.alpinelinux.org/alpine/acf/core/acf-core-0.4.20.tar.bz2/acf-core-0.4.20/lib/fs.lua
-function m.basename(string_, suffix)
+function _M.basename(string_, suffix)
   string_ = string_ or [[]]
   local basename = string.gsub(string_, '[^'.. LUA_DIRSEP ..']*'.. LUA_DIRSEP, [[]])
   if suffix then
@@ -34,20 +34,20 @@ end
 
 -- Tells whether the filename is a regular file
 -- by Fernando P. García
-function m.is_file(filename)
+function _M.is_file(filename)
   local file, err = lfs.attributes(filename)
   return err == nil and file.mode == [[file]] or false
 end
 
 -- Tells whether the filename is a directory
 -- by Fernando P. García
-function m.is_dir(path)
+function _M.is_dir(path)
   local directory, err = lfs.attributes(path)
   return directory ~= nil and directory.mode == [[directory]] or false
 end
 
 -- Copied from Luarocks' function of same name
-function m.normalize(name)
+function _M.normalize(name)
    return name:gsub("\\", "/"):gsub("(.)/*$", "%1")
 end
 
@@ -61,7 +61,7 @@ end
 -- @return string: a string with a platform-specific representation
 -- of the path.
 -- Copied from Luarocks' function of same name
-function m.path(...)
+function _M.path(...)
    local items = {...}
    local i = 1
    while items[i] do
@@ -82,7 +82,7 @@ end
 -- @param file string: filename to test
 -- @return boolean: true if file exists, false otherwise.
 -- Copied from Luarocks' function of same name.
-function m.is_writable(file)
+function _M.is_writable(file)
    file = normalize(file)
    local result
    if is_dir(file) then
@@ -101,19 +101,19 @@ end
 
 -- Opens file or URL
 -- TODO
-function m.fopen(filename, mode, use_include_path, context)
+function _M.fopen(filename, mode, use_include_path, context)
   if use_include_path == nil then use_include_path = false end
   return io.open(filename, mode)
 end
 
 -- Binary-safe file read
 -- TODO: validate "length"
-function m.fread(handle, length)
+function _M.fread(handle, length)
   return handle:read(length)
 end
 
 -- Thread-safe open file in read mode
-function m.safe_open(filepath, timeout, retry, sign)
+function _M.safe_open(filepath, timeout, retry, sign)
   if not timeout then timeout = 0.001 end
   if not retry then retry = 0 end -- for internal use only!
   if not sign then sign = [[]] end -- for internal use only!
@@ -142,7 +142,7 @@ function m.safe_open(filepath, timeout, retry, sign)
       sleep(timeout)
       retry = retry + 1
       if retry <= 224 then
-        return m.safe_open(filepath, timeout, retry)
+        return _M.safe_open(filepath, timeout, retry)
       else
         return nil, ([[%s retries without luck :(]]):format(retry - 1)
       end
@@ -158,12 +158,12 @@ function m.safe_open(filepath, timeout, retry, sign)
         fh:write("\n")
         fh:close()
         -- Try to re-open lock
-        return m.safe_open(filepath, timeout, retry, file_sign)
+        return _M.safe_open(filepath, timeout, retry, file_sign)
       else        
         sleep(timeout)
         retry = retry + 1
         if retry <= 224 then
-          return m.safe_open(filepath, timeout, retry)
+          return _M.safe_open(filepath, timeout, retry)
         else
           return nil, ([[%s retries without luck :(]]):format(retry - 1)
         end
@@ -175,7 +175,7 @@ function m.safe_open(filepath, timeout, retry, sign)
 end
 
 -- Write to file opened by safe_open()
-function m.safe_write(filepath, sign, data)
+function _M.safe_write(filepath, sign, data)
   if not sign then sign = [[]] end 
 
   local fh, err, unlocked
@@ -207,7 +207,7 @@ function m.safe_write(filepath, sign, data)
 end
 
 -- Unlock file opened by safe_open()
-function m.safe_close(filepath, sign)
+function _M.safe_close(filepath, sign)
   local file_lock, file_sign = filepath .. [[.lock]]
 
   fh, err = open(file_lock)
@@ -227,4 +227,4 @@ function m.safe_close(filepath, sign)
   end
 end
 
-return m
+return _M

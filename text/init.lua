@@ -7,14 +7,14 @@ local pcall, dofile, floor, tconcat = pcall, dofile, math.floor, table.concat
 local print, tinsert, tremove = print, table.insert, table.remove
 local slen, ssub, sfind, slower = string.len, string.sub, string.find, string.lower
 
-local m = {}
+local _M = {}
 
 -- Dependencies
 
 -- Split a string by another string
 -- Copied and adapted from http://luanet.net/lua/function/explode
 -- TODO: Improve performance
-function m.explode(delimiter, string_, limit)
+function _M.explode(delimiter, string_, limit)
   string_ = string_ or [[]]
   if limit == 0 then limit = 1 end
 
@@ -33,7 +33,7 @@ end
 
 -- Strip whitespace (or other characters) from the end of a string
 -- Copied and adapted from http://lua-users.org/wiki/CommonFunctions
-function m.ltrim(str, charlist)
+function _M.ltrim(str, charlist)
   charlist = charlist or '%s'
 
   return str:gsub('^[' .. charlist .. ']*', [[]])
@@ -41,7 +41,7 @@ end
 
 -- Strip whitespace (or other characters) from the beginning of a string
 -- Copied and adapted from http://lua-users.org/wiki/CommonFunctions
-function m.rtrim(s, pattern)
+function _M.rtrim(s, pattern)
   pattern = pattern or [[%s]]
   local n = #s
   while n > 0 and s:find([[^]] .. pattern, n) do n = n - 1 end
@@ -50,7 +50,7 @@ end
 
 -- Remove leading and/or trailing spaces
 -- Copied and adapted from http://lua-users.org/wiki/StringTrim
-function m.trim(str, charlist)
+function _M.trim(str, charlist)
   local lpeg = require [[lpeg]]
   if charlist == nil then
     charlist = lpeg.S(' \t\n\r\0\v')
@@ -62,7 +62,7 @@ end
 
 -- Return part of a string
 -- by Fernando P. García
-function m.substr(string_, start, length)
+function _M.substr(string_, start, length)
   if length then
     if length < 0 then
       length = slen(string_) + length
@@ -99,7 +99,7 @@ end
 
 -- Replace all occurrences of the search string with the replacement string
 -- by Fernando P. García
-function m.str_replace(search, replace, subject, count)
+function _M.str_replace(search, replace, subject, count)
   count = count or {['v'] = 0}
 
   local s, k
@@ -125,7 +125,7 @@ end
 
 -- Translate certain characters
 -- by Fernando P. García
-function m.strtr(...)
+function _M.strtr(...)
   local arg = {...}
   local str, from, to, replace_pairs
   str = arg[1] or [[]]
@@ -145,7 +145,7 @@ end
 
 -- Find position of first occurrence of a string
 -- by Fernando P. García
-function m.strpos(haystack, needle, offset)
+function _M.strpos(haystack, needle, offset)
   offset = offset or 1
   local start, end_ = nil, nil
   start, end_ = sfind(haystack, needle, offset, true)
@@ -156,7 +156,7 @@ ENT_QUOTES = 2
 ENT_COMPAT = 3
 -- Convert special characters to HTML entities
 -- Copied and adapted from http://lua-users.org/lists/lua-l/2008-01/msg00125.html
-function m.htmlspecialchars(string_, quote_style)
+function _M.htmlspecialchars(string_, quote_style)
   quote_style = quote_style or 2
 
   local output
@@ -180,7 +180,7 @@ end
 
 -- Find position of last occurrence of a char in a string
 -- by Fernando P. Garcia
-function m.strrpos(haystack, needle, offset)
+function _M.strrpos(haystack, needle, offset)
   offset = offset or 0
 
   local last
@@ -209,7 +209,7 @@ end
 -- Case insensitive string comparisons using a "natural order" algorithm
 -- Adapted from http://www.davekoelle.com/files/alphanum.lua (C) Andre Bogus
 -- by Fernando P. García
-function m.strnatcasecmp(str1, str2)
+function _M.strnatcasecmp(str1, str2)
   str1 = slower(str1) or [[]]
   str2 = slower(str2) or [[]]
 
@@ -232,7 +232,7 @@ end
 
 -- Join array elements with a string
 -- by Fernando P. García
-function m.implode(glue, pieces)
+function _M.implode(glue, pieces)
   local i
   local t = {}
   for _, i in pairs(pieces) do
@@ -247,7 +247,7 @@ do
 
     by LU324_ and DigitalKiwi.
   ]]
-  function m.str2map(s)
+  function _M.str2map(s)
     local map, rmap, i = {}, {}, 0
     for c in (s):gmatch('.') do
       i = i + 1
@@ -258,20 +258,20 @@ do
   end
 
   -- Default string map and maplen for int2strmap()
-  local default_map, default_maplen, default_rmap = m.str2map '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  local default_map, default_maplen, default_rmap = _M.str2map '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
   --[[
     Convert given integer to alphanumeric.
 
     by LU324_ and q66 (Copied and adapted from http://lua-users.org/lists/lua-l/2004-09/msg00054.html).
   ]]
-  function m.int2strmap(IN, map)
+  function _M.int2strmap(IN, map)
     local buffer, i, d, maplen = {}, 0
 
     if map == nil then
       map, maplen = default_map, default_maplen
     else
-      map, maplen = m.str2map(map)
+      map, maplen = _M.str2map(map)
     end
 
     while IN > 0 do
@@ -288,13 +288,13 @@ do
   --[[
     Convert given string to integer by (optional) given string map.
   ]]
-  function m.str2intmap(str, map)
+  function _M.str2intmap(str, map)
     local buffer, int, i, rmap, maplen = {}, 0, #str
 
     if map == nil then
       rmap, maplen = default_rmap, default_maplen
     else
-      map, maplen, rmap = m.str2map(map)
+      map, maplen, rmap = _M.str2map(map)
     end
 
     for c in (str):gmatch('.') do
@@ -306,4 +306,4 @@ do
   end
 end
 
-return m
+return _M
