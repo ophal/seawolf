@@ -251,7 +251,7 @@ do
     local map, rmap, i = {}, {}, 0
     for c in (s):gmatch('.') do
       i = i + 1
-      map[i] = c1
+      map[i] = c
       rmap[c] = i
     end
     return map, i, rmap
