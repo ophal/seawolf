@@ -1,8 +1,9 @@
-local seawolf = require 'seawolf'.__build 'text'
+local seawolf = require 'seawolf'.__build('text', 'contrib')
 local string, require, substr = string, require, seawolf.text.substr
 local tinsert, tconcat, mfloor, tremove = table.insert, tconcat, math.floor, table.remove
 local ssub, slen, sformat = string.sub, string.len, string.format
 local odate, otime = os.date, os.time
+local module_exists = seawolf.contrib.module_exists
 
 local _M = {}
 
@@ -307,8 +308,7 @@ do
 
   _hash.sha256[false] = require 'lsha2'.hash256
 
-  local work, rs = pcall(require, 'sha2')
-  if work then
+  if module_exists 'sha2' then
     _hash.sha256[true] = require 'sha2'.sha256hex
 
     _hash.sha384[false] = require 'sha2'.sha384hex
