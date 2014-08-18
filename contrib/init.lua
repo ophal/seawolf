@@ -172,6 +172,22 @@ function _M.seawolf_table(t)
   return t
 end
 
+-- Copied and adapted from http://stackoverflow.com/questions/15429236/how-to-check-if-a-module-exists-in-lua
+function _M.module_exists(name)
+  if package.loaded[name] then
+    return true
+  else
+    for _, searcher in ipairs(package.searchers or package.loaders) do
+      local loader = searcher(name)
+      if type(loader) == 'function' then
+        package.preload[name] = loader
+        return true
+      end
+    end
+    return false
+  end
+end
+
 -- Helper metatable
 _M.metahelper = {
   __index = function(t, k)
