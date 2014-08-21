@@ -1,8 +1,9 @@
+local seawolf = require 'seawolf'.__build 'contrib'
 local lfs, string = require [[lfs]], string
 local package, sleep, uuid = package, require 'socket'.sleep, require [[uuid]]
 local rename, remove, open = os.rename, os.remove, io.open
 local tconcat, tremove = table.concat, table.remove
-
+local module_exists = seawolf.contrib.module_exists
 
 -- LUA_DIRSEP is the first character in the string package.config, see
 -- src/loadlib.c in your lua source tree for reference
@@ -228,8 +229,8 @@ function _M.safe_close(filepath, sign)
 end
 
 -- Embed the lua-magic library
-do
-  local status, result = pcall(require, 'magic')
+if module_exists 'magic' then
+  local status, result = require 'magic'
   if status then
     _M.finfo = result
   end
