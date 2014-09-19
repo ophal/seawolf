@@ -230,10 +230,7 @@ end
 
 -- Embed the lua-magic library
 if module_exists 'magic' then
-  local status, result = require 'magic'
-  if status then
-    _M.finfo = result
-  end
+  _M.finfo = require 'magic'
 end
 
 return _M
