@@ -318,11 +318,11 @@ do
     _hash.sha384[true] = require 'sha2'.sha512
   end
 
-  function _M.hash(algo, data, raw_output)
-    if raw_output == nil then raw_output = false end
+  function _M.hash(algo, data, binary)
+    if binary == nil then binary = false end
 
     if _hash[algo] then
-      return _hash[algo][raw_output](data)
+      return _hash[algo][binary](data)
     else
       error(('[seawolf.other] in function hash(): unknown hash algorythm "%s"'):format(algo))
     end
