@@ -294,6 +294,7 @@ end
 do
   local _hash = {
     md5 = {},
+    sha1 = {},
     sha224 = {},
     sha256 = {},
     sha384 = {},
@@ -307,6 +308,11 @@ do
   _hash.sha224[true] = function() end
 
   _hash.sha256[false] = require 'lsha2'.hash256
+
+  if module_exists 'sha1' then
+    _hash.sha1[false] = require 'sha1'.sha1
+    _hash.sha1[true] = require 'sha1'.binary
+  end
 
   if module_exists 'sha2' then
     _hash.sha256[true] = require 'sha2'.sha256hex
