@@ -1,12 +1,11 @@
 package = 'seawolf'
-version = '1.0-0'
+version = '1.0-3'
 source = {
   url = 'git://github.com/ophal/seawolf.git',
-  tag = 'master',
+  tag = 'v1.0-3',
 }
 description = {
-  summary = 'Ophal toolkit library for back-end web development - HEAD.',
-  detailed = 'Current development branch of Seawolf.',
+  summary = 'Ophal toolkit library for back-end web development.',
   homepage = 'https://github.com/ophal/seawolf',
   license = 'GPL-3',
   maintainer = 'Fernando Paredes Garcia <fernando@develcuy.com>',
