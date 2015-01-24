@@ -160,6 +160,18 @@ function _M.table_append(t, v)
   t[#t + 1] = v
 end
 
+-- Run given callback on each element
+function _M.table_each(t, callback)
+  local stop
+
+  for _, v in pairs(t) do
+    stop = callback(v)
+    if stop then
+      break
+    end
+  end
+end
+
 -- Creates a new table with metatable set to _M.metahelper
 -- If table passed as argument, only assigns the metatable
 function _M.seawolf_table(t)
@@ -203,6 +215,7 @@ _M.metahelper = {
   dump = _M.table_dump,
   insert_multiple = _M.table_insert_multiple,
   append = _M.table_append,
+  each = _M.table_each,
 }
 
 return _M
