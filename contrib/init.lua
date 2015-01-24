@@ -164,8 +164,8 @@ end
 function _M.table_each(t, callback)
   local stop
 
-  for _, v in pairs(t) do
-    stop = callback(v)
+  for k, v in pairs(t) do
+    stop = callback(k, v)
     if stop then
       break
     end
