@@ -1,5 +1,5 @@
 -- Try lo load deprecated PREG library
-local rex_loaded, rex = pcall(function () return require [[rex_pcre]] end)
+local rex_loaded, rex = pcall(function() return require [[rex_pcre]] end)
 if rex_loaded then
   PREG_SPLIT_NO_EMPTY = 1
   PREG_SPLIT_DELIM_CAPTURE = 2
@@ -11,13 +11,13 @@ end
 local type, pairs = type, pairs
 local rawset, empty = rawset, empty
 
-module [[seawolf.text.preg]]
+local _M = {}
 
 -- PREG library (deprecated)
 
 -- Perform a regular expression search and replace
 -- Copied and adapted from http://lua-users.org/wiki/MakingLuaLikePhp
-function replace(pattern, replacement, subject, limit, pcre_flags)
+function _M.replace(pattern, replacement, subject, limit, pcre_flags)
   pcre_flags = pcre_flags or [[]]
 
   local sk, s, sp, p
@@ -59,7 +59,7 @@ end
 --
 -- For the use of pcre_flags parameter, please see the following link:
 --   http://www.php.net/manual/en/reference.pcre.pattern.modifiers.php
-function match(pattern, subject, matches, flags, offset, pcre_flags)
+function _M.match(pattern, subject, matches, flags, offset, pcre_flags)
   subject = subject or [[]]
   offset = offset or 1
 
@@ -110,7 +110,7 @@ end
 
 -- Perform a regular expression search and replace using a callback
 -- by Fernando P. García
-function replace_callback(pattern, callback, subject, limit, count, pcre_flags)
+function _M.replace_callback(pattern, callback, subject, limit, count, pcre_flags)
   limit = limit or -1
 
   local result
@@ -130,7 +130,7 @@ end
 -- by Fernando P. García
 -- TODO: pcre_flags should be read from pattern, just as in PHP
 -- TODO: flags should work just as in PHP
-function split(pattern, subject, limit, flags, pcre_flags)
+function _M.split(pattern, subject, limit, flags, pcre_flags)
   if limit == -1 or limit == 0 or limit == nil then limit = nil end
   flags = flags or 0
 
@@ -148,3 +148,4 @@ function split(pattern, subject, limit, flags, pcre_flags)
   return t
 end
 
+return _M
