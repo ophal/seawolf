@@ -32,10 +32,10 @@ do
     end
   end
 
-  function _M.table_concat(t)
+  function _M.table_concat(t, sep, i, j)
     local table, output = table, {}
     _table_concat(t, output)
-    return tconcat(output)
+    return tconcat(output, sep, i, j)
   end
 end
 
