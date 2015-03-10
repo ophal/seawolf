@@ -200,6 +200,42 @@ function _M.module_exists(name)
   end
 end
 
+-- Parse given text to date parts
+-- by develCuy and Outlastsheep
+do
+  local date_map = {
+    month = {
+      Jan = '01',
+      Feb = '02',
+      Mar = '03',
+      Apr = '04',
+      May = '05',
+      Jun = '06',
+      Jul = '07',
+      Aug = '08',
+      Sep = '09',
+      Oct = '10',
+      Nov = '11',
+      Dec = '12',
+    }
+  }
+
+  function _M.parse_date(text)
+    local dow, day, month_name, year, hours, minutes, seconds, timezone = text:match('(.-), (.-) (.-) (.-) (.-):(.-):(.-) (.+)')
+    return {
+      dow = dow,
+      month_name = month_name,
+      day = day,
+      month = date_map.month[month_name],
+      year = year,
+      hours = hours,
+      minutes = minutes,
+      seconds = seconds,
+      timezone = timezone,
+    }
+  end
+end
+
 -- Helper metatable
 _M.metahelper = {
   __index = function(t, k)
