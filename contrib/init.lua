@@ -252,6 +252,7 @@ _M.metahelper = {
   insert_multiple = _M.table_insert_multiple,
   append = _M.table_append,
   each = _M.table_each,
+  sort = table.sort,
 }
 
 return _M
