@@ -200,6 +200,41 @@ function _M.module_exists(name)
   end
 end
 
+-- Copied and adapted from: https://gist.github.com/HoraceBury/9001099
+--
+-- Cleans rich text so that HTML is cleanly removed, p and br tags are reduced
+-- to new lines and some special characters are replaced with the text
+-- equivelents.
+function _M.strip_tags(text)
+  text = text .. '!!>' -- patch (fix non-closed tag)
+
+  -- list of strings to replace (the order is important to avoid conflicts)
+  local cleaner = {
+    { "&amp;", "&" }, -- decode ampersands
+    { "&#151;", "-" }, -- em dash
+    { "&#146;", "'" }, -- right single quote
+    { "&#147;", "\"" }, -- left double quote
+    { "&#148;", "\"" }, -- right double quote
+    { "&#150;", "-" }, -- en dash
+    { "&#160;", " " }, -- non-breaking space
+    { "<br ?/?>", "\n" }, -- all <br> tags whether terminated or not (<br> <br/> <br />) become new lines
+    { "</p>", "\n" }, -- ends of paragraphs become new lines
+    { "(%b<>)", "" }, -- all other html elements are completely removed (must be done last)
+    { "\r", "\n" }, -- return carriage become new lines
+    { "[\n\n]+", "\n" }, -- reduce all multiple new lines with a single new line
+    { "^\n*", "" }, -- trim new lines from the start...
+    { "\n*$", "" }, -- ... and end
+  }
+
+  -- clean html from the string
+  for i = 1, #cleaner do
+    local cleans = cleaner[i]
+    text = text:gsub(cleans[1], cleans[2])
+  end
+
+  return text:gsub('!!>', '') -- unpatch
+end
+
 -- Parse given text to date parts
 -- by develCuy and Outlastsheep
 do
