@@ -7,10 +7,16 @@ local default_components = {
   'maths',
   'other',
   'text',
+  'text.preg',
   'variable',
 }
 
-local m = {}
+local m = {
+  version = {
+    number = '1.0',
+    revision = '4',
+  }
+}
 
 function m.__build(...)
   local components = {...}
