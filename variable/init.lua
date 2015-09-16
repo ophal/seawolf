@@ -254,8 +254,15 @@ end
 
 -- Implementation of is_numeric function
 -- TODO: review http://www.gammon.co_M.au/forum/bbshowpost.php?bbsubject_id=9271
-function _M.is_numeric(p)
-  return not _M.empty(tonumber(p))
+do
+  local falses = {
+    [false] = true,
+    [ [[]]] = true,
+  }
+  function _M.is_numeric (var)
+    var = tonumber(var)
+    return not (not var or falses[var] or (type(var) == [[table]] and next(var) == nil))
+  end
 end
 
 -- Call a user function given by the first parameter
