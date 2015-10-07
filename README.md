@@ -17,13 +17,13 @@ Seawolf packages reuse Lua modules that are helpful for web development.
 ### Functions by package
 NOTICE: some functions may be deprecated and/or replaced over time, in aims of improving Ophal's coding standards.
 
-* ** Behaviour **
+* **Behaviour**
   temp_dir
 
-* ** Calendar **
+* **Calendar**
   microtime
 
-* ** Database **
+* **Database**
   mysql_connect, mysql_error, mysql_fetch_assoc, mysql_real_escape_string, mysql_affected_rows, mysql_insert_id
 
 * **Filesystem**
