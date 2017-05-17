@@ -31,7 +31,7 @@ function _M.explode(delimiter, string_, limit)
   return arr
 end
 
--- Strip whitespace (or other characters) from the end of a string
+-- Strip whitespace (or other characters) from the beginning of a string
 -- Copied and adapted from http://lua-users.org/wiki/CommonFunctions
 function _M.ltrim(str, charlist)
   charlist = charlist or '%s'
@@ -39,7 +39,7 @@ function _M.ltrim(str, charlist)
   return str:gsub('^[' .. charlist .. ']*', [[]])
 end
 
--- Strip whitespace (or other characters) from the beginning of a string
+-- Strip whitespace (or other characters) from the end of a string
 -- Copied and adapted from http://lua-users.org/wiki/CommonFunctions
 function _M.rtrim(s, pattern)
   pattern = pattern or [[%s]]
