@@ -333,6 +333,34 @@ do
       error(('[seawolf.other] in function hash(): unknown hash algorythm "%s"'):format(algo))
     end
   end
+
+  if module_exists 'sha2' and module_exists 'hmac' then
+    local _hash_hmac = {}
+
+    require 'hmac.md5'
+    require 'hmac.sha2'
+
+    _hash_hmac.md5 = hmac.md5
+    _hash_hmac.sha256 = hmac.sha256
+    _hash_hmac.sha384 = hmac.sha384
+    _hash_hmac.sha512 = hmac.sha512
+
+    local function bintohex(s)
+      return (s:gsub('(.)', function(c)
+        return string.format('%02x', string.byte(c))
+      end))
+    end
+
+    function _M.hash_hmac(algo, data, key, raw_output)
+      if raw_output == nil then raw_output = false end
+
+      if _hash_hmac[algo] then
+        return raw_output and _hash_hmac[algo](data, key) or bintohex(_hash_hmac[algo](data, key))
+      else
+        error(('[seawolf.other] in function hash_hmac(): unknown hash algorythm "%s"'):format(algo))
+      end
+    end
+  end
 end
 
 return _M
