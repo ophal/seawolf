@@ -320,8 +320,8 @@ do
     _hash.sha384[false] = require 'sha2'.sha384hex
     _hash.sha384[true] = require 'sha2'.sha384
 
-    _hash.sha384[false] = require 'sha2'.sha512hex
-    _hash.sha384[true] = require 'sha2'.sha512
+    _hash.sha512[false] = require 'sha2'.sha512hex
+    _hash.sha512[true] = require 'sha2'.sha512
   end
 
   function _M.hash(algo, data, binary)
