@@ -157,11 +157,7 @@ function _M.print_r(expression, return_)
 
   local tableList, output = {}, {}
   function table_r(t, name, indent, full)
-    local serial = (string.len(full) == 0) and
-        (name or '') or
-        type(name)~= 'number' and  
-          '["'.. tostring(name) ..'"]' or
-          '['.. name ..']'
+    local serial = tostring(name)
     table.insert(output, indent .. serial ..(name ~= nil and ' = ' or ''))
     if type(t) == 'table' then
       if tableList[t] ~= nil then
