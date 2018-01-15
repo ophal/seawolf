@@ -235,6 +235,36 @@ function _M.strip_tags(text)
   return text:gsub('!!>', '') -- unpatch
 end
 
+-- Exchanges all keys with their associated values in a table
+function _M.table_flip(t)
+  local out, key, value = {}
+
+  for key, value in pairs(t) do
+    if [[string]] == type(value) or [[number]] == type(value) then
+      out[value] = key
+    else
+      out[key] = value
+    end
+  end
+
+  return out
+end
+
+-- Return all the keys of a table
+function _M.table_keys(input)
+  assert(type(input) == [[table]], [['bad argument #1 to 'table:keys()' (table expected, got ]].. type(input) ..[[)]])
+
+  local key
+  local keys, k = _M.seawolf_table(), 1
+
+  for key in pairs(input) do
+    keys[k] = key
+    k = k + 1
+  end
+
+  return keys
+end
+
 -- Parse given text to date parts
 -- by develCuy and Outlastsheep
 do
@@ -288,6 +318,8 @@ _M.metahelper = {
   append = _M.table_append,
   each = _M.table_each,
   sort = table.sort,
+  flip = _M.table_flip,
+  keys = _M.table_keys,
 }
 
 return _M
