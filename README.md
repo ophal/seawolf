@@ -1,4 +1,4 @@
-Seawolf is a toolkit library, it implements several handy functions to make Ophal developers life easier. It was originally planned to be a PHP standard library, but now is open to improvements and additions of other old and new approaches to web development.
+Seawolf was a Lua toolkit library focused on web development. It implements several handy functions to make Ophal developers life easier. It was originally planned to be a PHP standard library, but now is open to improvements and additions of other old and new approaches to web development.
 
 ### Dependencies
 Seawolf packages reuse Lua modules that are helpful for web development.
