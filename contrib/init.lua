@@ -33,7 +33,7 @@ do
   end
 
   function _M.table_concat(t, sep, i, j)
-    local table, output = table, {}
+    local output = {}
     _table_concat(t, output)
     return tconcat(output, sep, i, j)
   end
