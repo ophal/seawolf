@@ -172,6 +172,15 @@ function _M.table_each(t, callback)
   end
 end
 
+-- Whether such table has given value
+function _M.table_has(t, needle)
+  for _, v in pairs(t) do
+    if v == needle then
+      return true
+    end
+  end
+end
+
 -- Creates a new table with metatable set to _M.metahelper
 -- If table passed as argument, only assigns the metatable
 function _M.seawolf_table(t)
@@ -320,6 +329,7 @@ _M.metahelper = {
   sort = table.sort,
   flip = _M.table_flip,
   keys = _M.table_keys,
+  has = _M.table_has,
 }
 
 return _M
