@@ -299,6 +299,9 @@ do
 
     for c in (str):gmatch('.') do
       i = i - 1
+      if charValue == nil then
+        return nil
+      end
       int = int + (rmap[c] - 1)*maplen^i
     end
 
